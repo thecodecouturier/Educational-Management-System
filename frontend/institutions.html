@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏢 إدارة المؤسسات - Multi-Tenant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .action-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        
+        .institutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .institution-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .institution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .institution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .institution-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .institution-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .institution-info {
+            color: #6c757d;
+            line-height: 1.5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 إدارة المؤسسات</h1>
+            <p>نظام Multi-Tenant لإدارة عدة مؤسسات تعليمية</p>
+        </div>
+        
+        <div class="content">
+            <!-- إحصائيات سريعة -->
+            <div class="stats-panel" id="statsPanel">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalInstitutions">0</div>
+                    <div class="stat-label">إجمالي المؤسسات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeInstitutions">0</div>
+                    <div class="stat-label">المؤسسات النشطة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="countriesCount">0</div>
+                    <div class="stat-label">عدد البلدان</div>
+                </div>
+            </div>
+            
+            <!-- لوحة الأكشن -->
+            <div class="action-panel">
+                <button class="btn btn-success" onclick="showCreateModal()">
+                    🏢 إنشاء مؤسسة جديدة
+                </button>
+                <button class="btn" onclick="refreshInstitutions()">
+                    🔄 تحديث القائمة
+                </button>
+                <button class="btn" onclick="exportData()">
+                    📊 تصدير البيانات
+                </button>
+            </div>
+            
+            <!-- قائمة المؤسسات -->
+            <div class="institutions-grid" id="institutionsGrid">
+                <!-- سيتم ملؤها بـ JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal إنشاء/تحديث مؤسسة -->
+    <div id="institutionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal()">&times;</span>
+            <h2 id="modalTitle">إنشاء مؤسسة جديدة</h2>
+            
+            <form id="institutionForm">
+                <div class="form-group">
+                    <label for="institutionName">اسم المؤسسة:</label>
+                    <input type="text" id="institutionName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="institutionSlug">المعرف (Slug):</label>
+                    <input type="text" id="institutionSlug" placeholder="سيتم إنشاؤه تلقائياً">
+                </div>
+                
+                <div class="form-group">
+                    <label for="institutionTimezone">المنطقة الزمنية:</label>
+                    <select id="institutionTimezone">
+                        <option value="Africa/Cairo">Africa/Cairo (مصر)</option>
+                        <option value="Europe/Moscow">Europe/Moscow (روسيا)</option>
+                        <option value="America/New_York">America/New_York (أمريكا)</option>
+                        <option value="Europe/London">Europe/London (بريطانيا)</option>
+                        <option value="Asia/Dubai">Asia/Dubai (الإمارات)</option>
+                        <option value="Asia/Riyadh">Asia/Riyadh (السعودية)</option>
+                    </select>
+                    <button type="button" class="btn" onclick="autoDetectForNew()" style="margin-top: 10px;">
+                        🔍 كشف تلقائي
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="institutionCountry">الدولة:</label>
+                    <input type="text" id="institutionCountry">
+                </div>
+                
+                <div class="form-group">
+                    <label for="institutionCity">المدينة:</label>
+                    <input type="text" id="institutionCity">
+                </div>
+                
+                <div class="form-group">
+                    <label for="institutionAddress">العنوان:</label>
+                    <input type="text" id="institutionAddress">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ownerName">اسم المسؤول:</label>
+                    <input type="text" id="ownerName">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ownerEmail">البريد الإلكتروني:</label>
+                    <input type="email" id="ownerEmail">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ownerPhone">رقم الهاتف:</label>
+                    <input type="tel" id="ownerPhone">
+                </div>
+                
+                <button type="submit" class="btn btn-success">💾 حفظ المؤسسة</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let institutions = [];
+        let editingInstitution = null;
+
+        // تحميل البيانات عند البدء
+        window.onload = function() {
+            loadInstitutions();
+            loadStats();
+        };
+
+        // تحميل المؤسسات
+        async function loadInstitutions() {
+            try {
+                const response = await fetch('/institutions');
+                const data = await response.json();
+                
+                if (data.success) {
+                    institutions = data.institutions;
+                    renderInstitutions();
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل المؤسسات:', error);
+                alert('خطأ في تحميل البيانات');
+            }
+        }
+
+        // تحميل الإحصائيات
+        async function loadStats() {
+            try {
+                const response = await fetch('/institutions/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalInstitutions').textContent = data.stats.total;
+                    
+                    const activeCount = data.stats.byStatus.find(s => s._id === 'active')?.count || 0;
+                    document.getElementById('activeInstitutions').textContent = activeCount;
+                    
+                    document.getElementById('countriesCount').textContent = data.stats.byCountry.length;
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        // عرض المؤسسات
+        function renderInstitutions() {
+            const grid = document.getElementById('institutionsGrid');
+            grid.innerHTML = '';
+
+            institutions.forEach(institution => {
+                const card = document.createElement('div');
+                card.className = 'institution-card';
+                
+                const statusClass = institution.status === 'active' ? 'status-active' : 'status-inactive';
+                const statusText = institution.status === 'active' ? 'نشط' : 'غير نشط';
+                
+                card.innerHTML = `
+                    <div class="institution-header">
+                        <div class="institution-name">${institution.name}</div>
+                        <div class="institution-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="institution-info">
+                        <strong>🔗 المعرف:</strong> ${institution.slug}<br>
+                        <strong>🕐 المنطقة الزمنية:</strong> ${institution.timezone}<br>
+                        <strong>📍 الموقع:</strong> ${institution.location?.city || 'غير محدد'}, ${institution.location?.country || 'غير محدد'}<br>
+                        <strong>📅 تم الإنشاء:</strong> ${new Date(institution.createdAt).toLocaleDateString('ar-EG')}
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="editInstitution('${institution._id}')">✏️ تحديث</button>
+                        <button class="btn" onclick="autoDetectTimezone('${institution.slug}')">🔍 كشف تلقائي</button>
+                        <button class="btn btn-success" onclick="accessInstitution('${institution.slug}')">🚀 دخول النظام</button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // عرض نافذة الإنشاء
+        function showCreateModal() {
+            editingInstitution = null;
+            document.getElementById('modalTitle').textContent = 'إنشاء مؤسسة جديدة';
+            document.getElementById('institutionForm').reset();
+            document.getElementById('institutionModal').style.display = 'block';
+        }
+
+        // إخفاء النافذة
+        function hideModal() {
+            document.getElementById('institutionModal').style.display = 'none';
+        }
+
+        // حفظ المؤسسة
+        document.getElementById('institutionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('institutionName').value,
+                slug: document.getElementById('institutionSlug').value,
+                timezone: document.getElementById('institutionTimezone').value,
+                location: {
+                    country: document.getElementById('institutionCountry').value,
+                    city: document.getElementById('institutionCity').value,
+                    address: document.getElementById('institutionAddress').value
+                },
+                owner: {
+                    name: document.getElementById('ownerName').value,
+                    email: document.getElementById('ownerEmail').value,
+                    phone: document.getElementById('ownerPhone').value
+                }
+            };
+
+            try {
+                const response = await fetch('/institutions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ تم إنشاء المؤسسة بنجاح!');
+                    hideModal();
+                    loadInstitutions();
+                    loadStats();
+                } else {
+                    alert('❌ فشل في إنشاء المؤسسة: ' + data.message);
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+                alert('خطأ في الشبكة');
+            }
+        });
+
+        // كشف تلقائي لمؤسسة موجودة
+        async function autoDetectTimezone(slug) {
+            try {
+                const response = await fetch(`/institutions/${slug}/auto-detect-timezone`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`✅ تم كشف المنطقة الزمنية: ${data.detected.timezone}\n🌍 الدولة: ${data.detected.country}\n🏙️ المدينة: ${data.detected.city}`);
+                    loadInstitutions();
+                } else {
+                    alert('❌ فشل الكشف التلقائي');
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+                alert('خطأ في الكشف التلقائي');
+            }
+        }
+
+        // كشف تلقائي للمؤسسة الجديدة
+        async function autoDetectForNew() {
+            try {
+                const response = await fetch('/institutions/default/auto-detect-timezone', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('institutionTimezone').value = data.detected.timezone;
+                    document.getElementById('institutionCountry').value = data.detected.country || '';
+                    document.getElementById('institutionCity').value = data.detected.city || '';
+                    
+                    alert(`✅ تم كشف المنطقة الزمنية تلقائياً!`);
+                } else {
+                    alert('❌ فشل الكشف التلقائي');
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+                alert('خطأ في الكشف التلقائي');
+            }
+        }
+
+        // الدخول إلى نظام المؤسسة
+        function accessInstitution(slug) {
+            // فتح النظام الخاص بالمؤسسة
+            window.open(`/institution/${slug}/`, '_blank');
+        }
+
+        // تحديث القائمة
+        function refreshInstitutions() {
+            loadInstitutions();
+            loadStats();
+        }
+
+        // تصدير البيانات
+        function exportData() {
+            const dataStr = JSON.stringify(institutions, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'institutions_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        }
+
+        // إغلاق النافذة عند الضغط خارجها
+        window.onclick = function(event) {
+            const modal = document.getElementById('institutionModal');
+            if (event.target == modal) {
+                hideModal();
+            }
+        }
+    </script>
+
+    <!-- Authentication Check -->
+    <script>
+        // التحقق من تسجيل الدخول والصلاحيات
+        async function checkAuthentication() {
+            console.log('🔐 التحقق من المصادقة والصلاحيات لإدارة المؤسسات...');
+            
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userData = localStorage.getItem('user');
+            
+            if (isLoggedIn !== 'true' || !userData) {
+                alert('يجب تسجيل الدخول أولاً');
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            try {
+                const user = JSON.parse(userData);
+                
+                // التحقق من أن المستخدم مدير
+                if (user.role !== 'admin') {
+                    alert('⚠️ هذه الصفحة متاحة للمدراء فقط\n\nإدارة المؤسسات تتطلب صلاحيات إدارية.');
+                    window.location.href = 'index.html';
+                    return false;
+                }
+                
+                console.log('✅ تم التحقق من صلاحيات المدير لإدارة المؤسسات');
+                return true;
+                
+            } catch (error) {
+                console.error('خطأ في بيانات المستخدم:', error);
+                localStorage.clear();
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+        
+        // التحقق من Authentication عند تحميل الصفحة
+        (async function() {
+            const authResult = await checkAuthentication();
+            if (!authResult) {
+                throw new Error('Authentication required - Admin only');
+            }
+        })();
+    </script>
+</body>
+</html>

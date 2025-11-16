@@ -1,0 +1,1839 @@
+// 💰 نظام التحليلات المالية المتقدم
+
+class FinancialAnalyticsManager {
+    constructor() {
+        this.charts = {};
+        this.currentTab = 'dashboard';
+        this.apiBaseUrl = 'http://localhost:3001/api/financial-analytics';
+        this.currentData = {};
+        
+        this.init();
+    }
+
+    async init() {
+        console.log('🚀 تهيئة نظام التحليلات المالية...');
+        
+        // عرض حالة النظام
+        this.showSystemStatus();
+        
+        // تحديد التبويب النشط
+        this.switchTab('dashboard');
+        
+        // تحميل البيانات الأولية
+        await this.loadDashboardData();
+        
+        // إعداد أحداث النماذج
+        this.setupEventListeners();
+        
+        // تحديث دوري كل 5 دقائق
+        setInterval(() => {
+            if (this.currentTab === 'dashboard') {
+                this.loadDashboardData();
+            }
+        }, 5 * 60 * 1000);
+        
+        console.log('✅ تم تهيئة نظام التحليلات المالية بنجاح');
+    }
+
+    // عرض حالة النظام
+    async showSystemStatus() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/real-data/quick-stats`);
+            const data = await response.json();
+            
+            const statusBadge = document.createElement('div');
+            statusBadge.id = 'system-status-badge';
+            statusBadge.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                color: white;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transition: all 0.3s ease;
+            `;
+            
+            if (data.success && data.realData) {
+                statusBadge.style.background = 'linear-gradient(135deg, #38a169, #22543d)';
+                statusBadge.innerHTML = `
+                    <i class="fas fa-database"></i> بيانات حقيقية نشطة
+                    <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">
+                        ${data.data.revenue?.expected || 0} جنيه متوقع | ${data.data.breakdown?.length || 0} مجموعة
+                    </div>
+                `;
+            } else {
+                statusBadge.style.background = 'linear-gradient(135deg, #e53e3e, #742a2a)';
+                statusBadge.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i> بيانات تجريبية
+                    <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">
+                        النظام يعمل ببيانات وهمية للعرض
+                    </div>
+                `;
+            }
+            
+            document.body.appendChild(statusBadge);
+            
+            // إزالة البادج بعد 10 ثوان
+            setTimeout(() => {
+                if (document.getElementById('system-status-badge')) {
+                    statusBadge.style.opacity = '0.6';
+                    statusBadge.style.transform = 'scale(0.8)';
+                }
+            }, 10000);
+            
+        } catch (error) {
+            console.error('❌ خطأ في فحص حالة النظام:', error);
+        }
+    }
+
+    setupEventListeners() {
+        // نموذج خطة الميزانية الرئيسي
+        const budgetForm = document.getElementById('budget-plan-form');
+        if (budgetForm) {
+            budgetForm.addEventListener('submit', (e) => this.handleBudgetPlanSubmit(e));
+        }
+
+        // نموذج خطة الميزانية في المودال
+        const budgetModalForm = document.getElementById('budget-modal-form');
+        if (budgetModalForm) {
+            budgetModalForm.addEventListener('submit', (e) => this.handleBudgetModalSubmit(e));
+        }
+
+        // نموذج المعاملة المالية
+        const transactionForm = document.getElementById('transaction-modal-form');
+        if (transactionForm) {
+            transactionForm.addEventListener('submit', (e) => this.handleTransactionSubmit(e));
+        }
+    }
+
+    // 🔄 تبديل التبويبات
+    switchTab(tabName) {
+        console.log(`🔄 تبديل إلى تبويب: ${tabName}`);
+        
+        // إزالة الفئة النشطة من جميع التبويبات
+        document.querySelectorAll('.analytics-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // تفعيل التبويب المحدد
+        const activeTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+        const activeContent = document.getElementById(`${tabName}-tab`);
+        
+        if (activeTab && activeContent) {
+            activeTab.classList.add('active');
+            activeContent.classList.add('active');
+        }
+        
+        this.currentTab = tabName;
+        
+        // تحميل بيانات التبويب
+        this.loadTabData(tabName);
+    }
+
+    async loadTabData(tabName) {
+        try {
+            switch (tabName) {
+                case 'dashboard':
+                    await this.loadDashboardData();
+                    break;
+                case 'reports':
+                    await this.loadReportsData();
+                    break;
+                case 'metrics':
+                    await this.loadMetricsData();
+                    break;
+                case 'budget':
+                    await this.loadBudgetData();
+                    break;
+                case 'transactions':
+                    await this.loadTransactionsData();
+                    break;
+            }
+        } catch (error) {
+            console.error(`خطأ في تحميل بيانات التبويب ${tabName}:`, error);
+            this.showAlert('حدث خطأ في تحميل البيانات', 'danger');
+        }
+    }
+
+    // 📊 تحميل بيانات لوحة المؤشرات (بيانات حقيقية)
+    async loadDashboardData() {
+        try {
+            console.log('📊 جاري تحميل التحليلات المالية الشاملة من البيانات الحقيقية...');
+            
+            // جلب التحليلات الشاملة الجديدة
+            const comprehensiveResponse = await fetch(`${this.apiBaseUrl}/comprehensive-analytics`);
+            const comprehensiveData = await comprehensiveResponse.json();
+            
+            if (comprehensiveData.success) {
+                console.log('✅ تم جلب التحليلات الشاملة بنجاح:', comprehensiveData.data);
+                this.currentData.comprehensive = comprehensiveData.data;
+                this.updateDashboardUIWithComprehensiveData(comprehensiveData.data);
+                this.showAlert('تم تحميل البيانات الحقيقية بنجاح - نظام متكامل', 'success');
+                return;
+            }
+            
+            // إذا فشلت البيانات الشاملة، جرب البيانات السريعة
+            const realDataResponse = await fetch(`${this.apiBaseUrl}/real-data/quick-stats`);
+            const realData = await realDataResponse.json();
+            
+            if (realData.success && realData.realData) {
+                console.log('✅ تم جلب البيانات الحقيقية السريعة:', realData.data);
+                this.updateDashboardUIWithRealData(realData.data);
+                this.showAlert('تم تحميل البيانات الحقيقية', 'success');
+                return;
+            }
+            
+            // إذا فشلت البيانات الحقيقية، جرب API التحليلات المالية
+            const response = await fetch(`${this.apiBaseUrl}/dashboard`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.currentData.dashboard = data.dashboard;
+                this.updateDashboardUI(data.dashboard);
+                
+                if (data.realData) {
+                    console.log('✅ تم تحميل بيانات لوحة المؤشرات من البيانات الحقيقية');
+                    this.showAlert('تم تحميل البيانات الحقيقية من النظام', 'success');
+                } else {
+                    console.log('⚠️ تم تحميل بيانات تجريبية');
+                    this.showAlert('تم تحميل بيانات تجريبية للعرض', 'warning');
+                }
+            } else {
+                throw new Error(data.message || 'فشل في تحميل بيانات لوحة المؤشرات');
+            }
+        } catch (error) {
+            console.error('❌ خطأ في تحميل بيانات لوحة المؤشرات:', error);
+            this.showAlert('حدث خطأ في تحميل البيانات، جاري تحميل بيانات تجريبية', 'warning');
+            this.loadMockDashboardData();
+        }
+    }
+
+    // تحديث واجهة المستخدم بالبيانات الحقيقية
+    updateDashboardUIWithRealData(realData) {
+        console.log('🔄 تحديث الواجهة بالبيانات الحقيقية:', realData);
+        
+        // تحديث الإيراد الشهري
+        const monthlyRevenue = realData.revenue?.collected || 0;
+        document.getElementById('monthly-revenue').textContent = this.formatCurrency(monthlyRevenue);
+        
+        // تحديث نسبة التحصيل
+        const collectionRate = parseFloat(realData.revenue?.collectionRate) || 0;
+        document.getElementById('collection-rate').textContent = `${collectionRate.toFixed(1)}%`;
+        
+        // تحديث معدل النمو (حسابه بناءً على البيانات المتاحة)
+        const expectedRevenue = realData.revenue?.expected || 0;
+        const growthRate = expectedRevenue > 0 ? ((monthlyRevenue / expectedRevenue) * 100) - 100 : 0;
+        document.getElementById('growth-rate').textContent = `${growthRate.toFixed(1)}%`;
+        
+        // تحديث حالة الميزانية
+        document.getElementById('budget-status').textContent = `${collectionRate.toFixed(1)}%`;
+        
+        // تحديث مؤشرات التغيير
+        this.updateChangeIndicators(realData);
+        
+        // تحديث جدول المجموعات بالبيانات الحقيقية
+        if (realData.breakdown && realData.breakdown.length > 0) {
+            this.updateTopGroupsTableWithRealData(realData.breakdown);
+        } else {
+            console.log('⚠️ لا توجد بيانات مجموعات، استخدام بيانات تجريبية');
+            this.updateTopGroupsTable([]);
+        }
+        
+        // تحديث الرسوم البيانية بالبيانات الحقيقية
+        this.updateChartsWithRealData(realData);
+    }
+
+    updateChangeIndicators(realData) {
+        const revenue = realData.revenue || {};
+        
+        // تحديث مؤشر تغيير الإيراد
+        const revenueChange = document.getElementById('revenue-change');
+        if (revenueChange) {
+            const changePercent = revenue.collectionRate || 0;
+            revenueChange.innerHTML = `
+                <i class="fas fa-${changePercent >= 75 ? 'arrow-up' : changePercent >= 50 ? 'minus' : 'arrow-down'}"></i>
+                <span>${changePercent.toFixed(1)}%</span> نسبة التحصيل الحالية
+            `;
+            revenueChange.className = `metric-change ${changePercent >= 75 ? 'change-positive' : changePercent >= 50 ? 'change-neutral' : 'change-negative'}`;
+        }
+        
+        // تحديث مؤشر تغيير التحصيل
+        const collectionChange = document.getElementById('collection-change');
+        if (collectionChange) {
+            const pending = revenue.pending || 0;
+            const expected = revenue.expected || 0;
+            const pendingPercent = expected > 0 ? (pending / expected) * 100 : 0;
+            
+            collectionChange.innerHTML = `
+                <i class="fas fa-${pendingPercent <= 25 ? 'check-circle' : pendingPercent <= 50 ? 'clock' : 'exclamation-triangle'}"></i>
+                <span>${this.formatCurrency(pending)}</span> مبالغ معلقة
+            `;
+            collectionChange.className = `metric-change ${pendingPercent <= 25 ? 'change-positive' : pendingPercent <= 50 ? 'change-neutral' : 'change-negative'}`;
+        }
+    }
+
+    updateTopGroupsTableWithRealData(breakdown) {
+        const tableBody = document.getElementById('top-groups-table');
+        if (!tableBody) return;
+        
+        console.log('📋 تحديث جدول المجموعات بالبيانات الحقيقية:', breakdown);
+        
+        if (breakdown.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #718096;">لا توجد مجموعات نشطة حالياً</td>
+                </tr>
+            `;
+            return;
+        }
+        
+        // ترتيب المجموعات حسب نسبة التحصيل
+        const sortedGroups = breakdown.sort((a, b) => 
+            parseFloat(b.collectionRate || 0) - parseFloat(a.collectionRate || 0)
+        );
+        
+        tableBody.innerHTML = sortedGroups.slice(0, 5).map(group => {
+            const collectionRate = parseFloat(group.collectionRate || 0);
+            const statusClass = collectionRate >= 80 ? 'status-active' : 
+                               collectionRate >= 60 ? 'status-draft' : 'status-completed';
+            
+            return `
+                <tr>
+                    <td>${group.groupName || group.subject || 'مجموعة غير محددة'}</td>
+                    <td>${group.studentCount || 0}</td>
+                    <td>${this.formatCurrency(group.expectedRevenue || 0)}</td>
+                    <td>${this.formatCurrency(group.collectedRevenue || 0)}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            ${collectionRate.toFixed(1)}%
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 🆕 دالة جديدة لتحديث الواجهة بالتحليلات الشاملة
+    updateDashboardUIWithComprehensiveData(comprehensiveData) {
+        console.log('🔄 تحديث الواجهة بالتحليلات الشاملة:', comprehensiveData);
+        
+        const { financialSummary, overview, chartData, kpis, insights } = comprehensiveData;
+        
+        // تحديث المؤشرات المالية الرئيسية
+        const currentMonth = financialSummary.currentMonth;
+        document.getElementById('monthly-revenue').textContent = this.formatCurrency(currentMonth.collected);
+        document.getElementById('collection-rate').textContent = `${currentMonth.collectionRate.toFixed(1)}%`;
+        
+        // تحديث معدل النمو
+        const growthRate = financialSummary.trends.revenueGrowth;
+        document.getElementById('growth-rate').textContent = `${growthRate}%`;
+        
+        // تحديث حالة الميزانية (نسبة تحقيق الهدف)
+        document.getElementById('budget-status').textContent = `${currentMonth.collectionRate.toFixed(1)}%`;
+        
+        // تحديث الإحصائيات العامة
+        if (document.getElementById('total-students')) {
+            document.getElementById('total-students').textContent = overview.totalStudents;
+        }
+        if (document.getElementById('total-groups')) {
+            document.getElementById('total-groups').textContent = overview.totalGroups;
+        }
+        if (document.getElementById('avg-revenue-per-student')) {
+            document.getElementById('avg-revenue-per-student').textContent = this.formatCurrency(overview.averageRevenuePerStudent);
+        }
+        
+        // تحديث مؤشرات الأداء (KPIs)
+        this.updateKPICards(kpis);
+        
+        // تحديث مؤشرات التغيير الشاملة
+        this.updateComprehensiveChangeIndicators(financialSummary, kpis);
+        
+        // تحديث التنبيهات والتوصيات
+        this.updateInsightsSection(insights);
+        
+        // تحديث جدول المجموعات بالبيانات الشاملة
+        if (chartData.groupBreakdown && chartData.groupBreakdown.length > 0) {
+            this.updateTopGroupsTableWithRealData(chartData.groupBreakdown);
+        } else {
+            this.updateTopGroupsTable([]);
+        }
+        
+        // تحديث الرسوم البيانية بالبيانات الشاملة
+        this.updateChartsWithComprehensiveData(chartData);
+        
+        // عرض نقاط صحة النظام
+        this.updateSystemHealthScore(insights.healthScore);
+    }
+
+    // تحديث بطاقات مؤشرات الأداء
+    updateKPICards(kpis) {
+        // كفاءة التحصيل
+        const collectionEfficiency = document.getElementById('collection-efficiency');
+        if (collectionEfficiency) {
+            collectionEfficiency.textContent = `${kpis.collectionEfficiency.toFixed(1)}%`;
+        }
+        
+        // الاحتفاظ بالطلاب
+        const studentRetention = document.getElementById('student-retention');
+        if (studentRetention) {
+            studentRetention.textContent = `${kpis.studentRetention}%`;
+        }
+        
+        // متوسط تأخير المدفوعات
+        const paymentDelay = document.getElementById('payment-delay');
+        if (paymentDelay) {
+            paymentDelay.textContent = `${kpis.averagePaymentDelay} أيام`;
+        }
+        
+        // أفضل مجموعة أداء
+        const topGroup = document.getElementById('top-performing-group');
+        if (topGroup && kpis.topPerformingGroup) {
+            topGroup.textContent = kpis.topPerformingGroup.subjectName || kpis.topPerformingGroup.groupId;
+        }
+    }
+
+    // تحديث مؤشرات التغيير الشاملة
+    updateComprehensiveChangeIndicators(financialSummary, kpis) {
+        const trends = financialSummary.trends;
+        
+        // مؤشر تغيير الإيراد
+        const revenueChange = document.getElementById('revenue-change');
+        if (revenueChange) {
+            const direction = trends.direction;
+            const icon = direction === 'up' ? 'arrow-up' : direction === 'down' ? 'arrow-down' : 'minus';
+            const className = direction === 'up' ? 'change-positive' : direction === 'down' ? 'change-negative' : 'change-neutral';
+            
+            revenueChange.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${trends.revenueGrowth}%</span> نمو الإيراد
+            `;
+            revenueChange.className = `metric-change ${className}`;
+        }
+        
+        // مؤشر صحة النظام
+        const healthIndicator = document.getElementById('health-indicator');
+        if (healthIndicator) {
+            healthIndicator.innerHTML = `
+                <i class="fas fa-heart"></i>
+                <span>نقاط الصحة: ${kpis.healthScore || 0}</span>
+            `;
+            const healthClass = (kpis.healthScore || 0) >= 80 ? 'change-positive' : 
+                              (kpis.healthScore || 0) >= 60 ? 'change-neutral' : 'change-negative';
+            healthIndicator.className = `metric-change ${healthClass}`;
+        }
+    }
+
+    // تحديث قسم التنبيهات والتوصيات
+    updateInsightsSection(insights) {
+        // تحديث التنبيهات
+        const alertsContainer = document.getElementById('financial-alerts');
+        if (alertsContainer && insights.alerts) {
+            if (insights.alerts.length === 0) {
+                alertsContainer.innerHTML = '<div class="alert alert-success">✅ لا توجد تنبيهات مالية</div>';
+            } else {
+                alertsContainer.innerHTML = insights.alerts.map(alert => `
+                    <div class="alert alert-${alert.type}">
+                        <strong>${alert.type === 'warning' ? '⚠️' : '❌'}</strong> ${alert.message}
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // تحديث التوصيات
+        const recommendationsContainer = document.getElementById('financial-recommendations');
+        if (recommendationsContainer && insights.recommendations) {
+            if (insights.recommendations.length === 0) {
+                recommendationsContainer.innerHTML = '<div class="recommendation">💡 النظام يعمل بكفاءة ممتازة</div>';
+            } else {
+                recommendationsContainer.innerHTML = insights.recommendations.map(rec => `
+                    <div class="recommendation">💡 ${rec}</div>
+                `).join('');
+            }
+        }
+    }
+
+    // تحديث نقاط صحة النظام
+    updateSystemHealthScore(healthScore) {
+        const scoreElement = document.getElementById('system-health-score');
+        if (scoreElement) {
+            scoreElement.textContent = `${healthScore}/100`;
+            
+            // تغيير اللون حسب النقاط
+            const color = healthScore >= 80 ? '#10B981' : healthScore >= 60 ? '#F59E0B' : '#EF4444';
+            scoreElement.style.color = color;
+        }
+        
+        // تحديث شريط التقدم إن وجد
+        const progressBar = document.getElementById('health-progress-bar');
+        if (progressBar) {
+            progressBar.style.width = `${healthScore}%`;
+            progressBar.style.backgroundColor = healthScore >= 80 ? '#10B981' : healthScore >= 60 ? '#F59E0B' : '#EF4444';
+        }
+    }
+
+    // تحديث الرسوم البيانية بالبيانات الشاملة
+    updateChartsWithComprehensiveData(chartData) {
+        // رسم بياني شهري بالبيانات التاريخية
+        this.createMonthlyRevenueChart(chartData.monthly);
+        
+        // رسم بياني سنوي
+        this.createYearlyRevenueChart(chartData.yearly);
+        
+        // رسم بياني لتوزيع المجموعات
+        this.createGroupDistributionChart(chartData.groupBreakdown);
+        
+        // رسم بياني لنسبة التحصيل
+        this.createCollectionRateChart(chartData.monthly);
+    }
+
+    updateChartsWithRealData(realData) {
+        // رسم بياني لاتجاه الإيرادات مع البيانات الحقيقية
+        this.createRevenueTrendChartWithRealData(realData);
+        
+        // رسم بياني لنسبة التحصيل
+        this.createCollectionChartWithRealData(realData);
+        
+        // رسم بياني للنمو
+        this.createGrowthChart();
+        
+        // رسم بياني لتقدم الميزانية
+        this.createBudgetProgressChartWithRealData(realData);
+    }
+
+    createRevenueTrendChartWithRealData(realData) {
+        const ctx = document.getElementById('revenue-trend-chart');
+        if (!ctx) return;
+        
+        if (this.charts.revenueTrend) {
+            this.charts.revenueTrend.destroy();
+        }
+        
+        const revenue = realData.revenue || {};
+        
+        this.charts.revenueTrend = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['الشهر السابق', 'الشهر الحالي'],
+                datasets: [{
+                    label: 'الإيراد المحصل',
+                    data: [revenue.collected * 0.85 || 0, revenue.collected || 0], // تقدير الشهر السابق
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => this.formatCurrency(value)
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createCollectionChartWithRealData(realData) {
+        const ctx = document.getElementById('collection-chart');
+        if (!ctx) return;
+        
+        if (this.charts.collection) {
+            this.charts.collection.destroy();
+        }
+        
+        const revenue = realData.revenue || {};
+        const collected = revenue.collected || 0;
+        const pending = revenue.pending || 0;
+        const total = collected + pending;
+        
+        const collectedPercent = total > 0 ? (collected / total) * 100 : 0;
+        const pendingPercent = total > 0 ? (pending / total) * 100 : 0;
+        
+        this.charts.collection = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [`محصل (${this.formatCurrency(collected)})`, `معلق (${this.formatCurrency(pending)})`],
+                datasets: [{
+                    data: [collectedPercent, pendingPercent],
+                    backgroundColor: ['#38a169', '#e2e8f0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    createBudgetProgressChartWithRealData(realData) {
+        const ctx = document.getElementById('budget-progress-chart');
+        if (!ctx) return;
+        
+        if (this.charts.budgetProgress) {
+            this.charts.budgetProgress.destroy();
+        }
+        
+        const revenue = realData.revenue || {};
+        const achievementRate = parseFloat(revenue.collectionRate) || 0;
+        
+        this.charts.budgetProgress = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['مُحقق', 'متبقي'],
+                datasets: [{
+                    data: [achievementRate, 100 - achievementRate],
+                    backgroundColor: ['#43e97b', '#e2e8f0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    updateDashboardUI(dashboard) {
+        // تحديث الإيراد الشهري
+        const monthlyRevenue = dashboard.monthlyReport?.financialData?.collectedRevenue || 0;
+        document.getElementById('monthly-revenue').textContent = this.formatCurrency(monthlyRevenue);
+        
+        // تحديث نسبة التحصيل
+        const collectionRate = dashboard.monthlyReport?.financialData?.collectionRate || 0;
+        document.getElementById('collection-rate').textContent = `${collectionRate.toFixed(1)}%`;
+        
+        // تحديث معدل النمو
+        const growthRate = dashboard.monthlyReport?.growthMetrics?.revenueGrowth || 0;
+        document.getElementById('growth-rate').textContent = `${growthRate.toFixed(1)}%`;
+        
+        // تحديث حالة الميزانية
+        const activePlan = dashboard.activePlans?.[0];
+        if (activePlan) {
+            const achievementRate = activePlan.tracking?.currentProgress?.achievementRate || 0;
+            document.getElementById('budget-status').textContent = `${achievementRate.toFixed(1)}%`;
+        }
+        
+        // تحديث جدول المجموعات
+        this.updateTopGroupsTable(dashboard.monthlyReport?.financialData?.groupsBreakdown || []);
+        
+        // تحديث الرسوم البيانية
+        this.updateDashboardCharts(dashboard);
+    }
+
+    updateTopGroupsTable(groupsData) {
+        const tableBody = document.getElementById('top-groups-table');
+        if (!tableBody) return;
+        
+        // ترتيب المجموعات حسب نسبة التحصيل
+        const sortedGroups = groupsData.sort((a, b) => b.collectionRate - a.collectionRate);
+        
+        tableBody.innerHTML = sortedGroups.slice(0, 5).map(group => `
+            <tr>
+                <td>${group.subjectName || 'غير محدد'}</td>
+                <td>${group.studentsCount}</td>
+                <td>${this.formatCurrency(group.expectedAmount)}</td>
+                <td>${this.formatCurrency(group.collectedAmount)}</td>
+                <td>
+                    <span class="status-badge ${group.collectionRate >= 80 ? 'status-active' : group.collectionRate >= 60 ? 'status-draft' : 'status-completed'}">
+                        ${group.collectionRate.toFixed(1)}%
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    updateDashboardCharts(dashboard) {
+        // رسم بياني لاتجاه الإيرادات
+        this.createRevenueTrendChart();
+        
+        // رسم بياني لنسبة التحصيل
+        this.createCollectionChart();
+        
+        // رسم بياني للنمو
+        this.createGrowthChart();
+        
+        // رسم بياني لتقدم الميزانية
+        this.createBudgetProgressChart(dashboard.activePlans?.[0]);
+    }
+
+    createRevenueTrendChart() {
+        const ctx = document.getElementById('revenue-trend-chart');
+        if (!ctx) return;
+        
+        if (this.charts.revenueTrend) {
+            this.charts.revenueTrend.destroy();
+        }
+        
+        this.charts.revenueTrend = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+                datasets: [{
+                    label: 'الإيراد الشهري',
+                    data: this.generateMockMonthlyData(),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => this.formatCurrency(value)
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createCollectionChart() {
+        const ctx = document.getElementById('collection-chart');
+        if (!ctx) return;
+        
+        if (this.charts.collection) {
+            this.charts.collection.destroy();
+        }
+        
+        this.charts.collection = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['محصل', 'معلق'],
+                datasets: [{
+                    data: [75, 25],
+                    backgroundColor: ['#38a169', '#e2e8f0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    createGrowthChart() {
+        const ctx = document.getElementById('growth-chart');
+        if (!ctx) return;
+        
+        if (this.charts.growth) {
+            this.charts.growth.destroy();
+        }
+        
+        this.charts.growth = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'معدل النمو %',
+                    data: [5, 8, 12, 15],
+                    backgroundColor: ['#4facfe', '#00f2fe', '#4facfe', '#00f2fe']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => value + '%'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createBudgetProgressChart(budgetPlan) {
+        const ctx = document.getElementById('budget-progress-chart');
+        if (!ctx) return;
+        
+        if (this.charts.budgetProgress) {
+            this.charts.budgetProgress.destroy();
+        }
+        
+        const achievementRate = budgetPlan?.tracking?.currentProgress?.achievementRate || 0;
+        
+        this.charts.budgetProgress = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['مُحقق', 'متبقي'],
+                datasets: [{
+                    data: [achievementRate, 100 - achievementRate],
+                    backgroundColor: ['#43e97b', '#e2e8f0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // 📋 تحميل بيانات التقارير
+    async loadReportsData() {
+        try {
+            console.log('📋 جاري تحميل التقارير...');
+            
+            const response = await fetch(`${this.apiBaseUrl}/reports?limit=20`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateReportsList(data.reports);
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('❌ خطأ في تحميل التقارير:', error);
+            this.showAlert('حدث خطأ في تحميل التقارير', 'danger');
+        }
+    }
+
+    updateReportsList(reports) {
+        const reportsList = document.getElementById('reports-list');
+        if (!reportsList) return;
+        
+        if (reports.length === 0) {
+            reportsList.innerHTML = '<p class="metric-label">لا توجد تقارير مالية حالياً</p>';
+            return;
+        }
+        
+        reportsList.innerHTML = reports.map(report => `
+            <div class="report-item" style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; cursor: pointer;" onclick="viewReport('${report.reportId}')">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0; color: #2d3748;">${this.getReportTitle(report)}</h4>
+                        <p style="margin: 0.25rem 0; color: #718096;">${this.formatDate(report.generatedAt)}</p>
+                    </div>
+                    <div style="text-align: left;">
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #2d3748;">
+                            ${this.formatCurrency(report.financialData.collectedRevenue)}
+                        </div>
+                        <div style="font-size: 0.9rem; color: #718096;">
+                            نسبة التحصيل: ${report.financialData.collectionRate.toFixed(1)}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    getReportTitle(report) {
+        if (report.reportType === 'monthly') {
+            return `تقرير شهري - ${report.period.month}/${report.period.year}`;
+        } else if (report.reportType === 'yearly') {
+            return `تقرير سنوي - ${report.period.year}`;
+        }
+        return `تقرير ${report.reportType}`;
+    }
+
+    // 📈 تحميل بيانات المؤشرات
+    async loadMetricsData() {
+        try {
+            console.log('📈 جاري تحميل المؤشرات...');
+            
+            const today = new Date().toISOString().split('T')[0];
+            const response = await fetch(`${this.apiBaseUrl}/metrics/daily/${today}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateDailyMetrics(data.metrics);
+            }
+            
+            // تحميل الاتجاهات الأسبوعية
+            await this.loadWeeklyTrends();
+        } catch (error) {
+            console.error('❌ خطأ في تحميل المؤشرات:', error);
+            this.showAlert('حدث خطأ في تحميل المؤشرات', 'danger');
+        }
+    }
+
+    updateDailyMetrics(metrics) {
+        const dailyMetricsContainer = document.getElementById('daily-metrics');
+        if (!dailyMetricsContainer) return;
+        
+        if (metrics.length === 0) {
+            dailyMetricsContainer.innerHTML = '<p class="metric-label">لا توجد مؤشرات يومية</p>';
+            return;
+        }
+        
+        dailyMetricsContainer.innerHTML = metrics.map(metric => `
+            <div style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0; color: #2d3748;">${this.getMetricTitle(metric.metricType)}</h4>
+                        <p style="margin: 0.25rem 0; color: #718096;">${this.formatDate(metric.date)}</p>
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: 600; color: #2d3748;">
+                        ${this.formatMetricValue(metric)}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    getMetricTitle(metricType) {
+        const titles = {
+            'daily_revenue': 'الإيراد اليومي',
+            'collection_rate': 'نسبة التحصيل',
+            'student_performance': 'أداء الطلاب',
+            'group_performance': 'أداء المجموعات',
+            'payment_trends': 'اتجاهات الدفع'
+        };
+        return titles[metricType] || metricType;
+    }
+
+    formatMetricValue(metric) {
+        if (metric.metricType.includes('rate') || metric.metricType.includes('percentage')) {
+            return `${metric.values.primary.toFixed(1)}%`;
+        } else if (metric.metricType.includes('revenue') || metric.metricType.includes('amount')) {
+            return this.formatCurrency(metric.values.primary);
+        }
+        return metric.values.primary.toString();
+    }
+
+    async loadWeeklyTrends() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/metrics/weekly-trend/daily_revenue?weeks=4`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.createWeeklyTrendsChart(data.trend);
+            }
+        } catch (error) {
+            console.error('❌ خطأ في تحميل الاتجاهات الأسبوعية:', error);
+        }
+    }
+
+    createWeeklyTrendsChart(trendData) {
+        const ctx = document.getElementById('weekly-trends-chart');
+        if (!ctx) return;
+        
+        if (this.charts.weeklyTrends) {
+            this.charts.weeklyTrends.destroy();
+        }
+        
+        const labels = trendData.map(item => this.formatDate(item.date));
+        const values = trendData.map(item => item.values.primary);
+        
+        this.charts.weeklyTrends = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'الإيراد اليومي',
+                    data: values,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => this.formatCurrency(value)
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 🎯 تحميل بيانات الميزانية
+    async loadBudgetData() {
+        try {
+            console.log('🎯 جاري تحميل خطط الميزانية...');
+            
+            const response = await fetch(`${this.apiBaseUrl}/budget/plans/active`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateActivePlans(data.plans);
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('❌ خطأ في تحميل خطط الميزانية:', error);
+            this.showAlert('حدث خطأ في تحميل خطط الميزانية', 'danger');
+        }
+    }
+
+    updateActivePlans(plans) {
+        const activePlansContainer = document.getElementById('active-plans');
+        if (!activePlansContainer) return;
+        
+        if (plans.length === 0) {
+            activePlansContainer.innerHTML = '<p class="metric-label">لا توجد خطط ميزانية نشطة</p>';
+            return;
+        }
+        
+        activePlansContainer.innerHTML = plans.map(plan => `
+            <div style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="margin: 0; color: #2d3748;">${plan.planName}</h4>
+                        <p style="margin: 0.25rem 0; color: #718096;">${plan.planType} - ${this.formatDate(plan.period.startDate)} إلى ${this.formatDate(plan.period.endDate)}</p>
+                    </div>
+                    <span class="status-badge status-${plan.status}">${this.getPlanStatusText(plan.status)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>الهدف:</span>
+                    <span style="font-weight: 600;">${this.formatCurrency(plan.targets.totalRevenue)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>المُحقق:</span>
+                    <span style="font-weight: 600;">${this.formatCurrency(plan.tracking.currentProgress.actualRevenue)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>نسبة التحقق:</span>
+                    <span style="font-weight: 600; color: ${plan.tracking.currentProgress.achievementRate >= 80 ? '#38a169' : '#e53e3e'};">${plan.tracking.currentProgress.achievementRate.toFixed(1)}%</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    getPlanStatusText(status) {
+        const statusTexts = {
+            'draft': 'مسودة',
+            'approved': 'معتمدة',
+            'active': 'نشطة',
+            'completed': 'مكتملة',
+            'cancelled': 'ملغية'
+        };
+        return statusTexts[status] || status;
+    }
+
+    // 💳 تحميل بيانات المعاملات
+    async loadTransactionsData() {
+        try {
+            console.log('💳 جاري تحميل المعاملات المالية...');
+            
+            const response = await fetch(`${this.apiBaseUrl}/transactions?limit=20`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateTransactionsTable(data.transactions);
+            } else {
+                throw new Error(data.message);
+            }
+            
+            // تحميل بيانات النماذج
+            await this.loadFormData();
+        } catch (error) {
+            console.error('❌ خطأ في تحميل المعاملات:', error);
+            this.showAlert('حدث خطأ في تحميل المعاملات', 'danger');
+        }
+    }
+
+    updateTransactionsTable(transactions) {
+        const tableBody = document.getElementById('transactions-table');
+        if (!tableBody) return;
+        
+        if (transactions.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #718096;">لا توجد معاملات مالية</td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tableBody.innerHTML = transactions.map(transaction => `
+            <tr>
+                <td>${transaction.transactionId}</td>
+                <td>${this.formatDate(transaction.transactionDate)}</td>
+                <td>${this.getTransactionTypeText(transaction.transactionType)}</td>
+                <td>${transaction.parties.studentName}</td>
+                <td>${this.formatCurrency(transaction.amounts.final)}</td>
+                <td>
+                    <span class="status-badge status-${transaction.status.current}">
+                        ${this.getTransactionStatusText(transaction.status.current)}
+                    </span>
+                </td>
+                <td>
+                    <button class="action-btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="viewTransaction('${transaction.transactionId}')">
+                        <i class="fas fa-eye"></i> عرض
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    getTransactionTypeText(type) {
+        const types = {
+            'payment_received': 'دفعة مستلمة',
+            'refund_issued': 'استرداد',
+            'adjustment': 'تسوية',
+            'discount_applied': 'خصم',
+            'penalty_added': 'غرامة',
+            'transfer': 'تحويل',
+            'correction': 'تصحيح'
+        };
+        return types[type] || type;
+    }
+
+    getTransactionStatusText(status) {
+        const statuses = {
+            'pending': 'معلق',
+            'verified': 'موثق',
+            'completed': 'مكتمل',
+            'cancelled': 'ملغي',
+            'disputed': 'متنازع عليه'
+        };
+        return statuses[status] || status;
+    }
+
+    // 📊 إنشاء التقارير
+    async generateMonthlyReport() {
+        try {
+            console.log('📊 إنشاء تقرير شهري...');
+            this.showAlert('جاري إنشاء التقرير الشهري...', 'info');
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            
+            const response = await fetch(`${this.apiBaseUrl}/reports/monthly/${year}/${month}`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showAlert('تم إنشاء التقرير الشهري بنجاح', 'success');
+                if (this.currentTab === 'reports') {
+                    await this.loadReportsData();
+                }
+                if (this.currentTab === 'dashboard') {
+                    await this.loadDashboardData();
+                }
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('❌ خطأ في إنشاء التقرير الشهري:', error);
+            this.showAlert('حدث خطأ في إنشاء التقرير الشهري', 'danger');
+        }
+    }
+
+    async generateDailyMetrics() {
+        try {
+            console.log('📈 حساب المؤشرات اليومية...');
+            this.showAlert('جاري حساب المؤشرات اليومية...', 'info');
+            
+            const response = await fetch(`${this.apiBaseUrl}/metrics/daily`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    date: new Date().toISOString()
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showAlert('تم حساب المؤشرات اليومية بنجاح', 'success');
+                if (this.currentTab === 'metrics') {
+                    await this.loadMetricsData();
+                }
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('❌ خطأ في حساب المؤشرات اليومية:', error);
+            this.showAlert('حدث خطأ في حساب المؤشرات اليومية', 'danger');
+        }
+    }
+
+    // 🎯 إدارة خطط الميزانية
+    async handleBudgetPlanSubmit(event) {
+        event.preventDefault();
+        
+        try {
+            const formData = new FormData(event.target);
+            const planData = {
+                planName: formData.get('plan-name') || document.getElementById('plan-name').value,
+                planType: formData.get('plan-type') || document.getElementById('plan-type').value,
+                totalRevenue: parseFloat(formData.get('target-revenue') || document.getElementById('target-revenue').value),
+                startDate: this.calculateStartDate(formData.get('plan-type') || document.getElementById('plan-type').value),
+                endDate: this.calculateEndDate(formData.get('plan-type') || document.getElementById('plan-type').value)
+            };
+            
+            await this.createBudgetPlan(planData);
+            
+            // إعادة تعيين النموذج
+            event.target.reset();
+            
+        } catch (error) {
+            console.error('❌ خطأ في إرسال خطة الميزانية:', error);
+            this.showAlert('حدث خطأ في حفظ خطة الميزانية', 'danger');
+        }
+    }
+
+    async handleBudgetModalSubmit(event) {
+        event.preventDefault();
+        
+        try {
+            const planData = {
+                planName: document.getElementById('modal-plan-name').value,
+                planType: document.getElementById('modal-plan-type').value,
+                startDate: document.getElementById('modal-start-date').value,
+                endDate: document.getElementById('modal-end-date').value,
+                totalRevenue: parseFloat(document.getElementById('modal-target-revenue').value)
+            };
+            
+            await this.createBudgetPlan(planData);
+            
+            // إغلاق المودال وإعادة تعيين النموذج
+            this.closeBudgetPlanModal();
+            
+        } catch (error) {
+            console.error('❌ خطأ في إرسال خطة الميزانية:', error);
+            this.showAlert('حدث خطأ في حفظ خطة الميزانية', 'danger');
+        }
+    }
+
+    async createBudgetPlan(planData) {
+        console.log('🎯 إنشاء خطة ميزانية جديدة:', planData);
+        this.showAlert('جاري حفظ خطة الميزانية...', 'info');
+        
+        const response = await fetch(`${this.apiBaseUrl}/budget/plans`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(planData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showAlert('تم حفظ خطة الميزانية بنجاح', 'success');
+            if (this.currentTab === 'budget') {
+                await this.loadBudgetData();
+            }
+        } else {
+            throw new Error(data.message);
+        }
+    }
+
+    // 💳 إدارة المعاملات المالية
+    async handleTransactionSubmit(event) {
+        event.preventDefault();
+        
+        try {
+            const transactionData = {
+                transactionType: document.getElementById('modal-transaction-type').value,
+                amount: parseFloat(document.getElementById('modal-amount').value),
+                studentId: document.getElementById('modal-student').value,
+                groupId: document.getElementById('modal-group').value,
+                paymentMethod: document.getElementById('modal-payment-method').value,
+                notes: document.getElementById('modal-notes').value
+            };
+            
+            console.log('💳 تسجيل معاملة مالية جديدة:', transactionData);
+            this.showAlert('جاري تسجيل المعاملة المالية...', 'info');
+            
+            const response = await fetch(`${this.apiBaseUrl}/transactions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(transactionData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showAlert(`تم تسجيل المعاملة بنجاح - رقم الإيصال: ${data.receiptNumber}`, 'success');
+                if (this.currentTab === 'transactions') {
+                    await this.loadTransactionsData();
+                }
+                this.closeTransactionModal();
+            } else {
+                throw new Error(data.message);
+            }
+            
+        } catch (error) {
+            console.error('❌ خطأ في تسجيل المعاملة المالية:', error);
+            this.showAlert('حدث خطأ في تسجيل المعاملة المالية', 'danger');
+        }
+    }
+
+    // 🔧 Helper Methods
+
+    calculateStartDate(planType) {
+        const now = new Date();
+        if (planType === 'monthly') {
+            return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        } else if (planType === 'quarterly') {
+            const quarter = Math.floor(now.getMonth() / 3);
+            return new Date(now.getFullYear(), quarter * 3, 1).toISOString().split('T')[0];
+        } else if (planType === 'yearly') {
+            return new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+        }
+        return now.toISOString().split('T')[0];
+    }
+
+    calculateEndDate(planType) {
+        const now = new Date();
+        if (planType === 'monthly') {
+            return new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        } else if (planType === 'quarterly') {
+            const quarter = Math.floor(now.getMonth() / 3);
+            return new Date(now.getFullYear(), (quarter + 1) * 3, 0).toISOString().split('T')[0];
+        } else if (planType === 'yearly') {
+            return new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0];
+        }
+        return now.toISOString().split('T')[0];
+    }
+
+    async loadFormData() {
+        try {
+            // تحميل قائمة الطلاب
+            const studentsResponse = await fetch('http://localhost:3001/api/students');
+            const studentsData = await studentsResponse.json();
+            
+            if (studentsData.success) {
+                const studentSelect = document.getElementById('modal-student');
+                if (studentSelect) {
+                    studentSelect.innerHTML = studentsData.students.map(student => 
+                        `<option value="${student._id}">${student.name}</option>`
+                    ).join('');
+                }
+            }
+            
+            // تحميل قائمة المجموعات
+            const groupsResponse = await fetch('http://localhost:3001/api/groups');
+            const groupsData = await groupsResponse.json();
+            
+            if (groupsData.success) {
+                const groupSelect = document.getElementById('modal-group');
+                if (groupSelect) {
+                    groupSelect.innerHTML = groupsData.groups.map(group => 
+                        `<option value="${group._id}">${group.subject} - ${group.teacher}</option>`
+                    ).join('');
+                }
+            }
+        } catch (error) {
+            console.error('❌ خطأ في تحميل بيانات النماذج:', error);
+        }
+    }
+
+    generateMockMonthlyData() {
+        return Array.from({ length: 12 }, () => Math.floor(Math.random() * 50000) + 20000);
+    }
+
+    loadMockDashboardData() {
+        console.log('🔄 تحميل بيانات تجريبية...');
+        
+        document.getElementById('monthly-revenue').textContent = this.formatCurrency(75000);
+        document.getElementById('collection-rate').textContent = '78.5%';
+        document.getElementById('growth-rate').textContent = '12.3%';
+        document.getElementById('budget-status').textContent = '85.2%';
+        
+        // جدول المجموعات التجريبية
+        const mockGroups = [
+            { subjectName: 'الرياضيات - الصف الثالث', studentsCount: 25, expectedAmount: 25000, collectedAmount: 20000, collectionRate: 80 },
+            { subjectName: 'الفيزياء - الصف الثاني', studentsCount: 20, expectedAmount: 20000, collectedAmount: 15000, collectionRate: 75 },
+            { subjectName: 'الكيمياء - الصف الأول', studentsCount: 18, expectedAmount: 18000, collectedAmount: 16000, collectionRate: 89 }
+        ];
+        
+        this.updateTopGroupsTable(mockGroups);
+        this.createRevenueTrendChart();
+        this.createCollectionChart();
+        this.createGrowthChart();
+        this.createBudgetProgressChart();
+    }
+
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('ar-EG', {
+            style: 'currency',
+            currency: 'EGP',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+
+    formatDate(date) {
+        return new Intl.DateTimeFormat('ar-EG', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }).format(new Date(date));
+    }
+
+    showAlert(message, type = 'info') {
+        // إزالة التنبيهات السابقة
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            ${message}
+        `;
+        
+        const container = document.querySelector('.analytics-container');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // إزالة التنبيه تلقائياً بعد 5 ثوان
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+
+    showBudgetPlanModal() {
+        document.getElementById('budget-plan-modal').style.display = 'block';
+    }
+
+    closeBudgetPlanModal() {
+        document.getElementById('budget-plan-modal').style.display = 'none';
+        document.getElementById('budget-modal-form').reset();
+    }
+
+    showTransactionModal() {
+        document.getElementById('transaction-modal').style.display = 'block';
+        this.loadFormData();
+    }
+
+    closeTransactionModal() {
+        document.getElementById('transaction-modal').style.display = 'none';
+        document.getElementById('transaction-modal-form').reset();
+    }
+
+    exportReports() {
+        this.showAlert('ميزة تصدير التقارير قيد التطوير', 'info');
+    }
+
+    // فحص حالة البيانات الحقيقية
+    async checkRealDataStatus() {
+        try {
+            this.showAlert('جاري فحص حالة البيانات...', 'info');
+            
+            const response = await fetch(`${this.apiBaseUrl}/real-data/quick-stats`);
+            const data = await response.json();
+            
+            if (data.success && data.realData) {
+                const revenue = data.data.revenue || {};
+                const breakdown = data.data.breakdown || [];
+                
+                this.showAlert(`
+                    ✅ البيانات الحقيقية نشطة!<br>
+                    💰 الإيراد المتوقع: ${this.formatCurrency(revenue.expected || 0)}<br>
+                    💚 المحصل: ${this.formatCurrency(revenue.collected || 0)}<br>
+                    📊 نسبة التحصيل: ${revenue.collectionRate || 0}%<br>
+                    📚 عدد المجموعات: ${breakdown.length}
+                `, 'success');
+                
+                // إعادة تحميل البيانات
+                if (this.currentTab === 'dashboard') {
+                    await this.loadDashboardData();
+                }
+            } else {
+                this.showAlert('⚠️ النظام يعمل حالياً ببيانات تجريبية. يرجى إضافة طلاب ومجموعات ومدفوعات حقيقية.', 'warning');
+            }
+        } catch (error) {
+            console.error('❌ خطأ في فحص البيانات:', error);
+            this.showAlert('حدث خطأ في فحص حالة البيانات', 'danger');
+        }
+    }
+
+    refreshReports() {
+        if (this.currentTab === 'reports') {
+            this.loadReportsData();
+        }
+    }
+
+    viewReport(reportId) {
+        this.showAlert(`عرض التقرير ${reportId} - قيد التطوير`, 'info');
+    }
+
+    viewTransaction(transactionId) {
+        this.showAlert(`عرض المعاملة ${transactionId} - قيد التطوير`, 'info');
+    }
+}
+
+// إنشاء مثيل من مدير التحليلات المالية
+let financialAnalyticsManager;
+
+// تبديل التبويبات (وظيفة عامة)
+function switchTab(tabName) {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.switchTab(tabName);
+    }
+}
+
+// إنشاء تقرير شهري (وظيفة عامة)
+function generateMonthlyReport() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.generateMonthlyReport();
+    }
+}
+
+// حساب المؤشرات اليومية (وظيفة عامة)
+function generateDailyMetrics() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.generateDailyMetrics();
+    }
+}
+
+// إظهار مودال خطة الميزانية (وظيفة عامة)
+function showBudgetPlanModal() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.showBudgetPlanModal();
+    }
+}
+
+// إغلاق مودال خطة الميزانية (وظيفة عامة)
+function closeBudgetPlanModal() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.closeBudgetPlanModal();
+    }
+}
+
+// إظهار مودال المعاملة المالية (وظيفة عامة)
+function showTransactionModal() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.showTransactionModal();
+    }
+}
+
+// إغلاق مودال المعاملة المالية (وظيفة عامة)
+function closeTransactionModal() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.closeTransactionModal();
+    }
+}
+
+// تصدير التقارير (وظيفة عامة)
+function exportReports() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.exportReports();
+    }
+}
+
+// تحديث التقارير (وظيفة عامة)
+function refreshReports() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.refreshReports();
+    }
+}
+
+// عرض التقرير (وظيفة عامة)
+function viewReport(reportId) {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.viewReport(reportId);
+    }
+}
+
+// عرض المعاملة (وظيفة عامة)
+function viewTransaction(transactionId) {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.viewTransaction(transactionId);
+    }
+}
+
+// فحص حالة البيانات الحقيقية (وظيفة عامة)
+function checkRealDataStatus() {
+    if (financialAnalyticsManager) {
+        financialAnalyticsManager.checkRealDataStatus();
+    }
+}
+        
+        const labels = monthlyData.map(data => data.month || data.fullMonth);
+        const expected = monthlyData.map(data => data.expected || 0);
+        const collected = monthlyData.map(data => data.collected || 0);
+        
+        this.charts.monthlyRevenue = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'الإيراد المتوقع',
+                        data: expected,
+                        borderColor: '#94A3B8',
+                        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'الإيراد المحصل',
+                        data: collected,
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'اتجاه الإيرادات الشهرية'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' ج.م';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 📊 رسم بياني للإيرادات السنوية
+    createYearlyRevenueChart(yearlyData) {
+        const ctx = document.getElementById('yearly-revenue-chart');
+        if (!ctx || !yearlyData) return;
+        
+        if (this.charts.yearlyRevenue) {
+            this.charts.yearlyRevenue.destroy();
+        }
+        
+        const labels = yearlyData.map(data => data.year.toString());
+        const expected = yearlyData.map(data => data.expected || 0);
+        const collected = yearlyData.map(data => data.collected || 0);
+        
+        this.charts.yearlyRevenue = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'الإيراد المتوقع',
+                        data: expected,
+                        backgroundColor: 'rgba(148, 163, 184, 0.7)',
+                        borderColor: '#94A3B8',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'الإيراد المحصل',
+                        data: collected,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: '#10B981',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'الإيرادات السنوية'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' ج.م';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 📊 رسم بياني لتوزيع المجموعات
+    createGroupDistributionChart(groupBreakdown) {
+        const ctx = document.getElementById('group-distribution-chart');
+        if (!ctx || !groupBreakdown || groupBreakdown.length === 0) return;
+        
+        if (this.charts.groupDistribution) {
+            this.charts.groupDistribution.destroy();
+        }
+        
+        const labels = groupBreakdown.map(group => group.subjectName || group.groupId);
+        const revenues = groupBreakdown.map(group => group.collectedRevenue || group.expectedRevenue || 0);
+        const colors = [
+            '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6',
+            '#EC4899', '#14B8A6', '#F97316', '#84CC16', '#6366F1'
+        ];
+        
+        this.charts.groupDistribution = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: revenues,
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    },
+                    title: {
+                        display: true,
+                        text: 'توزيع الإيرادات حسب المجموعات'
+                    }
+                }
+            }
+        });
+    }
+
+    // 📊 رسم بياني لنسبة التحصيل
+    createCollectionRateChart(monthlyData) {
+        const ctx = document.getElementById('collection-rate-chart');
+        if (!ctx || !monthlyData) return;
+        
+        if (this.charts.collectionRate) {
+            this.charts.collectionRate.destroy();
+        }
+        
+        const labels = monthlyData.map(data => data.month || data.fullMonth);
+        const rates = monthlyData.map(data => data.collectionRate || 0);
+        
+        this.charts.collectionRate = new Chart(ctx, {
+            type: 'area',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'نسبة التحصيل %',
+                    data: rates,
+                    borderColor: '#6366F1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'نسبة التحصيل عبر الوقت'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    financialAnalyticsManager = new FinancialAnalyticsManager();
+});
+
+// إغلاق المودالات عند النقر خارجها
+window.addEventListener('click', (event) => {
+    const budgetModal = document.getElementById('budget-plan-modal');
+    const transactionModal = document.getElementById('transaction-modal');
+    
+    if (event.target === budgetModal) {
+        closeBudgetPlanModal();
+    }
+    
+    if (event.target === transactionModal) {
+        closeTransactionModal();
+    }
+});

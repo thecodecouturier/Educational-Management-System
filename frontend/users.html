@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إدارة المستخدمين - Educational Management System</title>
+  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* تطبيق ثيم financial-analytics و index الكامل */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f8f9fa;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      position: relative;
+    }
+
+    .container {
+      max-width: 100% !important;
+      width: 100% !important;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .user-management {
+      background: white;
+      border-radius: 15px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 2rem;
+    }
+
+    .user-management:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .user-management h2 {
+      color: #2d3748;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    /* تحسين مظهر النماذج */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #4a5568;
+      font-size: 0.95rem;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      background: #f7fafc;
+      color: #2d3748;
+      font-weight: 500;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .form-group select {
+      cursor: pointer;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: left 1rem center;
+      background-size: 1.25rem;
+      padding-left: 2.75rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5a67d8 0%, #6b42a0 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #5f6d7e 0%, #3c444f 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(113, 128, 150, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #3da866 0%, #2f8a5a 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #e35555 0%, #d32f2f 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(245, 101, 101, 0.3);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: linear-gradient(135deg, #d97706 0%, #c56110 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(237, 137, 54, 0.3);
+    }
+
+    /* تحسين مظهر الجداول - نسخة طبق الأصل من index.html */
+    .table-container {
+      margin-top: 2rem;
+      overflow-x: auto;
+      border: 2px solid #e2e8f0;
+      border-radius: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: #f7fafc;
+      color: #4a5568;
+      font-weight: 600;
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    /* حواف دائرية للزوايا العلوية */
+    thead th:first-child {
+      border-top-right-radius: 12px;
+    }
+
+    thead th:last-child {
+      border-top-left-radius: 12px;
+    }
+
+    /* حواف دائرية للزوايا السفلية */
+    tbody tr:last-child td:first-child {
+      border-bottom-right-radius: 12px;
+    }
+
+    tbody tr:last-child td:last-child {
+      border-bottom-left-radius: 12px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: center;
+      color: #4a5568;
+      font-size: 0.95rem;
+    }
+
+    tbody tr:hover {
+      background-color: #f7fafc;
+    }
+
+    /* تصغير الأزرار في الجدول - نسخة طبق الأصل من index.html */
+    td .btn, td button {
+      padding: 5px 10px !important;
+      margin: 5px !important;
+      cursor: pointer !important;
+      border-radius: 4px !important;
+      border: 1px solid #bdbdbd !important;
+      background: #f7f7fa !important;
+      font-size: 15px !important;
+      transition: background 0.2s !important;
+      box-shadow: none !important;
+      font-weight: normal !important;
+      color: #000 !important;
+    }
+
+    td .btn:hover, td button:hover {
+      background: #eaeaea !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* إلغاء جميع الأنماط الخاصة للأزرار الملونة */
+    td .btn-warning,
+    td .btn-danger,
+    td .btn-success,
+    td .btn-secondary {
+      padding: 5px 10px !important;
+      margin: 5px !important;
+      cursor: pointer !important;
+      border-radius: 4px !important;
+      border: 1px solid #bdbdbd !important;
+      background: #f7f7fa !important;
+      font-size: 15px !important;
+      transition: background 0.2s !important;
+      box-shadow: none !important;
+      font-weight: normal !important;
+      color: #000 !important;
+    }
+
+    td .btn-warning:hover,
+    td .btn-danger:hover,
+    td .btn-success:hover,
+    td .btn-secondary:hover {
+      background: #eaeaea !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* تحسين مظهر input وselect في الجدول */
+    td input, td select {
+      padding: 0.45rem 0.65rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: white;
+      color: #2d3748;
+      transition: all 0.2s ease;
+      min-width: 120px;
+    }
+
+    td input:focus, td select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #f8f9ff;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+
+    td input[readonly] {
+      background: #f7fafc;
+      color: #718096;
+      cursor: not-allowed;
+    }
+
+    /* تحسين عرض كلمة المرور */
+    .password {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #4a5568;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+    }
+
+    .eye-icon {
+      cursor: pointer;
+      color: #667eea;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+
+    .eye-icon:hover {
+      color: #5a67d8;
+      transform: scale(1.15);
+    }
+
+    .eye-icon svg {
+      stroke: currentColor;
+      width: 18px;
+      height: 18px;
+    }
+
+    /* تحسين عمود الصلاحيات */
+    td small {
+      display: inline-block;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #718096;
+      font-size: 0.8rem;
+    }
+
+    h3 {
+      color: #2d3748;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin: 2rem 0 1rem 0;
+    }
+
+    /* تحسين البحث */
+    .search-container {
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .search-container input {
+      width: 100%;
+      max-width: 500px;
+      padding: 1rem 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      color: #2d3748;
+      background: #f7fafc;
+    }
+
+    .search-container input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: scale(1.02);
+    }
+
+    .search-container input::placeholder {
+      color: #a0aec0;
+      font-weight: 400;
+    }
+
+    /* تحسين مظهر الصلاحيات */
+    .permissions-section {
+      background: #f7fafc;
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin: 1.5rem 0;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .permissions-section:hover {
+      border-color: #667eea;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.1);
+    }
+
+    .permissions-section h4 {
+      color: #2d3748;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .user-management-panel {
+        padding: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+
+    /* Custom Multiselect Styles for Permissions */
+    .custom-multiselect {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Modal Styles - نسخة من index.html */
+    .table-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content-table {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      max-width: 95vw;
+      width: auto;
+      min-width: 800px;
+      max-height: 90vh;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header-table {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px 35px;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .modal-header-table h3 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .close-modal-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    .modal-body-table {
+      padding: 30px;
+      overflow-x: auto;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-body-table table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+    }
+
+    .modal-body-table table thead {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+    }
+
+    .modal-body-table table th {
+      background: #f7fafc !important;
+      color: #4a5568 !important;
+      font-weight: 600 !important;
+      padding: 12px 8px !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      text-align: center !important;
+      white-space: nowrap;
+    }
+
+    .modal-body-table table td {
+      padding: 12px 8px !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      text-align: center !important;
+      color: #4a5568 !important;
+      font-size: 0.95rem !important;
+    }
+
+    /* حقول الإدخال والـ select في وضع التعديل */
+    .modal-body-table table td input,
+    .modal-body-table table td select {
+      min-width: 120px;
+      max-width: 200px;
+    }
+
+    .modal-body-table table td button {
+      white-space: nowrap;
+    }
+
+    .modal-body-table table tbody tr:hover {
+      background-color: #f7fafc !important;
+    }
+
+    .modal-body-table .search-container {
+      margin-bottom: 20px;
+    }
+
+    /* تحسين الـ scrollbar */
+    .modal-body-table::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .modal-body-table::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    .modal-body-table::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 10px;
+    }
+
+    .modal-body-table::-webkit-scrollbar-thumb:hover {
+      background: #764ba2;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .modal-content-table {
+        width: 95vw;
+        max-width: 95vw;
+        min-width: unset;
+        max-height: 90vh;
+      }
+
+      .modal-header-table {
+        padding: 20px;
+      }
+
+      .modal-header-table h3 {
+        font-size: 18px;
+      }
+
+      .modal-body-table {
+        padding: 20px;
+      }
+
+      .modal-body-table table {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Custom Multiselect Styles for Permissions */
+    .custom-multiselect {
+      position: relative;
+      width: 100%;
+    }
+
+    .custom-multiselect .select-box {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .custom-multiselect .select-box:hover {
+      border-color: #007bff;
+    }
+
+    .custom-multiselect.open .select-box {
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .custom-multiselect .options-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid #007bff;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .permission-group {
+      border-bottom: 1px solid #f1f3f4;
+    }
+
+    .permission-group:last-child {
+      border-bottom: none;
+    }
+
+    .main-permission {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      transition: background-color 0.2s ease;
+    }
+
+    .main-permission:hover {
+      background: #e9ecef;
+    }
+
+    .main-permission input[type="checkbox"] {
+      margin-left: 10px;
+      transform: scale(1.2);
+    }
+
+    .main-permission span {
+      flex: 1;
+    }
+
+    .expand-arrow {
+      margin-right: 10px;
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .permission-group.expanded .expand-arrow {
+      transform: rotate(180deg);
+    }
+
+    .sub-permissions {
+      background: white;
+    }
+
+    .sub-permission {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px 8px 40px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background-color 0.2s ease;
+    }
+
+    .sub-permission:hover {
+      background: #f8f9fa;
+    }
+
+    .sub-permission input[type="checkbox"] {
+      margin-left: 8px;
+    }
+
+    .single-permission {
+      background: white !important;
+    }
+
+    .single-permission:hover {
+      background: #f8f9fa !important;
+    }
+
+    /* Edit Permissions Styles */
+    .edit-permissions-container {
+      position: relative;
+      min-width: 250px;
+    }
+
+    #editCustomPermissions .select-box {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    #editCustomPermissions .options-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 250px;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- User Management Section -->
+    <section class="user-management">
+      <h2>
+        <i class="fa-solid fa-user-plus" style="color: #667eea; font-size: 24px;"></i>
+        تسجيل المستخدمين وإدارة الصلاحيات
+      </h2>
+
+      <form id="userForm">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName"><i class="fa-solid fa-user"></i> الاسم الأول:</label>
+              <input type="text" id="firstName" required placeholder="أدخل الاسم الأول">
+            </div>
+            <div class="form-group">
+              <label for="lastName"><i class="fa-solid fa-user"></i> الاسم الأخير:</label>
+              <input type="text" id="lastName" required placeholder="أدخل الاسم الأخير">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="username"><i class="fa-solid fa-at"></i> اسم المستخدم:</label>
+              <input type="text" id="username" readonly placeholder="يُنشأ تلقائياً">
+            </div>
+            <div class="form-group">
+              <label for="password"><i class="fa-solid fa-key"></i> كلمة المرور:</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="password" readonly style="flex: 1;" placeholder="يُنشأ تلقائياً">
+                <button type="button" id="generatePassword" class="btn btn-secondary" disabled>
+                  <i class="fa-solid fa-rotate"></i>
+                  توليد جديدة
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="role"><i class="fa-solid fa-user-shield"></i> الصلاحية:</label>
+            <select id="role">
+              <option value="admin">مدير</option>
+              <option value="receptionist">موظف استقبال</option>
+              <option value="follow_up_staff">موظف متابعة</option>
+            </select>
+          </div>
+          
+          <div class="permissions-section">
+            <h4>الصلاحيات التفصيلية:</h4>
+            <div class="custom-multiselect nested-permissions" id="customPermissions">
+              <div class="select-box">اختر الصلاحيات</div>
+              <div class="options-list">
+                
+                <!-- الإدارة العامة للموارد -->
+                <div class="permission-group">
+                  <label class="main-permission">
+                    <input type="checkbox" value="general_management" class="main-checkbox"> 
+                    <span>الإدارة العامة للموارد</span>
+                    <span class="expand-arrow">▼</span>
+                  </label>
+                  <div class="sub-permissions" style="display: none;">
+                    <label class="sub-permission">
+                      <input type="checkbox" value="add_subject"> إضافة مادة
+                    </label>
+                    <label class="sub-permission">
+                      <input type="checkbox" value="add_teacher"> إضافة أستاذ
+                    </label>
+                    <label class="sub-permission">
+                      <input type="checkbox" value="add_group"> إضافة مجموعة
+                    </label>
+                  </div>
+                </div>
+
+                <!-- الاستقبال والتسجيل -->
+                <div class="permission-group">
+                  <label class="main-permission">
+                    <input type="checkbox" value="reception_registration" class="main-checkbox">
+                    <span>الاستقبال والتسجيل</span>
+                    <span class="expand-arrow">▼</span>
+                  </label>
+                  <div class="sub-permissions" style="display: none;">
+                    <label class="sub-permission">
+                      <input type="checkbox" value="register_student"> تسجيل طالب
+                    </label>
+                    <label class="sub-permission">
+                      <input type="checkbox" value="manage_subscriptions"> إدارة الاشتراكات
+                    </label>
+                    <label class="sub-permission">
+                      <input type="checkbox" value="manage_payments"> إدارة المدفوعات
+                    </label>
+                  </div>
+                </div>
+
+                <!-- المتابعة والحضور -->
+                <div class="permission-group">
+                  <label class="main-permission single-permission">
+                    <input type="checkbox" value="follow_up_attendance" class="main-checkbox">
+                    <span>المتابعة والحضور</span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <button type="submit" class="btn btn-success">
+              <i class="fa-solid fa-user-plus"></i>
+              إضافة مستخدم
+            </button>
+            <button type="button" onclick="showUsersModal()" class="btn-secondary" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; white-space: nowrap;">
+              <i class="fa-solid fa-list"></i> عرض المستخدمين
+            </button>
+          </div>
+      </form>
+      
+      <!-- جدول المستخدمين مخفي في الصفحة العادية -->
+      <table id="usersTable" style="display: none;">
+        <thead>
+          <tr id="usersTableHeader">
+            <th><i class="fa-solid fa-hashtag"></i> ID</th>
+            <th id="name-header"><i class="fa-solid fa-user"></i> الاسم</th>
+            <th><i class="fa-solid fa-at"></i> اسم المستخدم</th>
+            <th><i class="fa-solid fa-key"></i> كلمة المرور</th>
+            <th><i class="fa-solid fa-user-shield"></i> الصلاحية</th>
+            <th><i class="fa-solid fa-gear"></i> الأكشن</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- Modal عرض المستخدمين -->
+  <div id="usersModal" class="table-modal" style="display: none;">
+    <div class="modal-overlay" onclick="hideTableModal('usersModal')"></div>
+    <div class="modal-content-table">
+      <div class="modal-header-table">
+        <h3><i class="fa-solid fa-users"></i> قائمة المستخدمين</h3>
+        <button onclick="hideTableModal('usersModal')" class="close-modal-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body-table">
+        <div class="search-container">
+          <input type="text" id="modalSearch" placeholder="🔍 ابحث باسم المستخدم أو الاسم...">
+        </div>
+        <div id="usersTableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Check -->
+  <script>
+    // التحقق من تسجيل الدخول والصلاحيات
+    async function checkAuthentication() {
+      console.log('🔐 التحقق من المصادقة والصلاحيات...');
+      
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userData = localStorage.getItem('user');
+      
+      if (isLoggedIn !== 'true' || !userData) {
+        alert('يجب تسجيل الدخول أولاً');
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      try {
+        const user = JSON.parse(userData);
+        
+        // التحقق من أن المستخدم مدير
+        if (user.role !== 'admin') {
+          alert('هذه الصفحة متاحة للمدراء فقط');
+          window.location.href = 'index.html';
+          return false;
+        }
+        
+        console.log('✅ تم التحقق من صلاحيات المدير');
+        return true;
+        
+      } catch (error) {
+        console.error('خطأ في بيانات المستخدم:', error);
+        localStorage.clear();
+        window.location.href = 'login.html';
+        return false;
+      }
+    }
+    
+    // التحقق من Authentication عند تحميل الصفحة
+    (async function() {
+      const authResult = await checkAuthentication();
+      if (!authResult) {
+        throw new Error('Authentication required');
+      }
+    })();
+
+    // دوال الـ modal للمستخدمين
+    let originalUsersParent = null;
+
+    function showUsersModal() {
+      const modal = document.getElementById('usersModal');
+      const container = document.getElementById('usersTableContainer');
+      const originalTable = document.getElementById('usersTable');
+      
+      if (modal && container && originalTable) {
+        // حفظ الموقع الأصلي للجدول
+        originalUsersParent = originalTable.parentElement;
+        
+        // نقل الجدول إلى الـ modal
+        originalTable.style.display = 'table';
+        container.innerHTML = '';
+        container.appendChild(originalTable);
+        
+        // عرض الـ modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      } else {
+        console.log('Missing elements:', {
+          modal: !!modal,
+          container: !!container,
+          originalTable: !!originalTable
+        });
+      }
+    }
+
+    function hideTableModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal && modal.style.display === 'flex') {
+        // إرجاع الجدول لموقعه الأصلي
+        if (modalId === 'usersModal' && originalUsersParent) {
+          const table = document.getElementById('usersTable');
+          if (table) {
+            table.style.display = 'none';
+            originalUsersParent.appendChild(table);
+          }
+        }
+        
+        // إخفاء الـ modal
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // إغلاق الـ modal عند الضغط على Escape
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('usersModal');
+        if (modal && modal.style.display === 'flex') {
+          hideTableModal('usersModal');
+        }
+      }
+    });
+  </script>
+
+  <script src="users-script.js"></script>
+</body>
+</html>

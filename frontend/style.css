@@ -1,0 +1,1314 @@
+/* 🎨 خلفية ديناميكية تشبه واتساب */
+.pattern-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  color: #2a2a2a; /* لون الرموز */
+  opacity: 0.25; /* درجة شفافية أوضح */
+  background-color: transparent;
+  pointer-events: none; /* لا تتداخل مع التفاعل */
+  overflow: hidden;
+  width: 100vw; /* عرض الـ viewport كامل */
+  height: 100vh; /* ارتفاع الـ viewport كامل */
+}
+
+.pattern-bg svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* يغطي المساحة كاملة */
+  object-position: center;
+}
+
+/* تحسين تدرج الخلفية */
+body {
+  position: relative;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* تأثير ضبابي خفيف للخلفية */
+.pattern-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(0.5px);
+  z-index: 1;
+}
+
+.eye-icon {
+	vertical-align: middle;
+}
+.eye-icon svg {
+	vertical-align: middle;
+}
+body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
+h1 { text-align: center; margin-top: 30px; }
+.user-management { max-width: 700px; margin: 30px auto; background: #fafafa; border: 1px solid #ddd; border-radius: 8px; padding: 30px; }
+form label { display: block; margin: 10px 0; }
+form input, form select { padding: 5px; margin-right: 10px; }
+form button { margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+thead { background: #eee; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+tr:nth-child(even) { background: #f9f9f9; }
+#search { width: 60%; padding: 6px; margin-bottom: 10px; }
+#edit-password {
+  margin-bottom: 12px;
+  vertical-align: middle;
+}
+#edit-generatePassword {
+  vertical-align: middle;
+}
+.section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background: #fff;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.sub-section {
+  margin-bottom: 30px;
+  border: 1.5px solid #c7c7c7;
+  border-radius: 7px;
+  padding: 15px;
+  background: #fafbfc;
+}
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 24px;
+}
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+form > div {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+thead tr {
+  background: #f3f4f6;
+}
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 8px;
+  text-align: left;
+  font-size: 15px;
+}
+th {
+  font-weight: 600;
+  color: #444;
+}
+button {
+  padding: 5px 10px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #bdbdbd;
+  background: #f7f7fa;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #eaeaea;
+}
+input[type="text"] {
+  padding: 6px 10px;
+  border: 1.5px solid #bdbdbd;
+  border-radius: 4px;
+  background: #fafbfc;
+  font-size: 15px;
+  min-width: 110px;
+  margin: 0 2px;
+}
+#customLevels, #customClasses {
+  min-width: 110px;
+  width: 140px;
+  display: inline-block;
+}
+/* قوائم الاختيار من متعدد */
+.custom-multiselect {
+  position: relative;
+  min-width: 100px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.custom-multiselect .select-box {
+  border: 1.5px solid #bdbdbd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: #fff;
+  cursor: pointer;
+  min-width: 100px;
+}
+.custom-multiselect .options-list {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 110%;
+  background: #fff;
+  border: 1.5px solid #bdbdbd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 4px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 10;
+  min-width: 200px;
+}
+
+/* تنسيق خاص للقائمة المتداخلة */
+.nested-permissions.custom-multiselect .options-list {
+  min-width: 380px;
+  max-height: 450px;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  border: 2px solid #007bff20;
+}
+.custom-multiselect.open .options-list {
+  display: block;
+}
+.custom-multiselect .options-list label {
+  font-size: 14px;
+  padding: 2px 10px;
+  cursor: pointer;
+  display: block;
+}
+.custom-multiselect .options-list input[type="checkbox"] {
+  margin-left: 6px;
+}
+#teachersTable input#edit-teacherFirstName {
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* تنسيق الصلاحيات المتداخلة */
+.nested-permissions .permission-group {
+  margin-bottom: 12px;
+}
+
+.nested-permissions .main-permission {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nested-permissions .main-permission:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nested-permissions .main-permission.single-permission {
+  background: #fff;
+  border: 2px solid #dee2e6;
+}
+
+.nested-permissions .main-permission.single-permission:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.nested-permissions .expand-arrow {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  color: #6c757d;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.nested-permissions .permission-group.expanded .expand-arrow {
+  transform: rotate(180deg);
+  color: #007bff;
+}
+
+.nested-permissions .sub-permissions {
+  margin-top: 12px;
+  margin-right: 24px;
+  border-right: 3px solid #007bff;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 4px;
+  background: #f8f9ff;
+  border-radius: 0 8px 8px 0;
+}
+
+.nested-permissions .sub-permission {
+  display: block;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid #e9ecef;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.nested-permissions .sub-permission:hover {
+  background: #f0f8ff;
+  border-color: #007bff;
+  transform: translateX(4px);
+}
+
+.nested-permissions .main-checkbox {
+  margin-left: 10px;
+  transform: scale(1.2);
+}
+
+.nested-permissions .sub-permission input[type="checkbox"] {
+  margin-left: 8px;
+  transform: scale(1.1);
+}
+
+/* تحسينات إضافية للوضوح */
+.nested-permissions .main-permission span:first-of-type {
+  flex-grow: 1;
+  padding-left: 8px;
+}
+
+.nested-permissions .sub-permission:last-child {
+  margin-bottom: 0;
+}
+
+/* تحسين شكل الـ scrollbar للقوائم الطويلة */
+.nested-permissions.custom-multiselect .options-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nested-permissions.custom-multiselect .options-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.nested-permissions.custom-multiselect .options-list::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 4px;
+}
+
+.nested-permissions.custom-multiselect .options-list::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+/* تنسيق حاوي تعديل الصلاحيات في الجدول */
+.edit-permissions-container {
+  position: relative;
+  min-width: 200px;
+}
+
+.edit-permissions-container .custom-multiselect {
+  width: 100%;
+}
+
+.edit-permissions-container .select-box {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.edit-permissions-container .select-box:hover {
+  background: #138496;
+  transform: translateY(-1px);
+}
+
+.edit-permissions-container .options-list {
+  min-width: 300px;
+  left: -50px;
+  z-index: 1000;
+}
+
+/* تحسين السهم في وضع التعديل */
+.edit-permissions-container .expand-arrow {
+  cursor: pointer !important;
+  user-select: none;
+  padding: 4px;
+}
+
+.edit-permissions-container .main-permission span {
+  cursor: pointer !important;
+}
+
+.edit-permissions-container .main-permission {
+  cursor: default;
+}
+
+/* حالة التوسيع في التعديل */
+.edit-permissions-container .permission-group.expanded .expand-arrow {
+  transform: rotate(180deg);
+  color: #007bff;
+}
+
+/* تصميم جدول تقارير المدفوعات - حساب ديناميكي للمساحة */
+.payment-reports-scroll-container {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  /* الارتفاع يتم حسابه ديناميكياً بواسطة JavaScript */
+  min-height: 200px !important; /* حد أدنى للارتفاع */
+  border: 2px solid #17a2b8 !important;
+  border-radius: 8px !important;
+  background-color: white !important;
+  box-shadow: 0 4px 8px rgba(23, 162, 184, 0.2) !important;
+  /* تحسين الأداء */
+  contain: layout style paint !important;
+}
+
+/* شريط التمرير لتقارير المدفوعات */
+.payment-reports-scroll-container::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+.payment-reports-scroll-container::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 7px;
+}
+
+.payment-reports-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #17a2b8, #138496);
+  border-radius: 7px;
+  border: 2px solid #f8f9fa;
+}
+
+.payment-reports-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #138496, #0f6674);
+}
+
+/* جدول تقارير المدفوعات */
+.payment-reports-scroll-container #paymentReportTable {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 0 !important;
+  font-size: 14px !important;
+}
+
+.payment-reports-scroll-container #paymentReportTable thead {
+  background: #17a2b8 !important;
+  color: white !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.payment-reports-scroll-container #paymentReportTable thead th {
+  padding: 15px !important;
+  border: 1px solid #fff !important;
+  text-align: center !important;
+  font-weight: bold !important;
+  background: #17a2b8 !important;
+  color: white !important;
+}
+
+.payment-reports-scroll-container #paymentReportTable tbody td {
+  padding: 12px !important;
+  border: 1px solid #dee2e6 !important;
+  text-align: center !important;
+  vertical-align: top !important;
+  line-height: 1.4 !important;
+}
+
+.payment-reports-scroll-container #paymentReportTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa !important;
+}
+
+.payment-reports-scroll-container #paymentReportTable tbody tr:hover {
+  background-color: #e3f2fd !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* تحسين النص داخل خلايا التقرير */
+.payment-reports-scroll-container #paymentReportTable tbody td > div {
+  max-height: 80px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+/* � تصميم معدل النمو السنوي */
+.growth-comparison-table {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+  border: 1px solid #dee2e6;
+}
+
+.comparison-title {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.years-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.year-item {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.year-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.year-item.current-year {
+  border-color: #007bff;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+}
+
+.year-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.year-label {
+  font-weight: bold;
+  color: #495057;
+  font-size: 14px;
+}
+
+.growth-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.growth-badge.positive {
+  background: #d4edda;
+  color: #155724;
+}
+
+.growth-badge.negative {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.growth-badge.neutral {
+  background: #e2e3e5;
+  color: #495057;
+}
+
+.year-revenue {
+  font-weight: bold;
+  color: #212529;
+  font-size: 13px;
+}
+
+.growth-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.summary-label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 13px;
+}
+
+.summary-value {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.summary-value.positive {
+  color: #28a745;
+}
+
+.summary-value.negative {
+  color: #dc3545;
+}
+
+/* تحسين للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .years-comparison {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .year-item {
+    padding: 10px;
+  }
+  
+  .growth-summary {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+/* �📊 تصميم نسبة التحصيل */
+.collection-tracking-details {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+  border: 1px solid #dee2e6;
+}
+
+.collection-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.collection-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.collection-item:last-child {
+  margin-bottom: 0;
+}
+
+.collection-icon {
+  font-size: 18px;
+  margin-left: 12px;
+  opacity: 0.8;
+}
+
+.collection-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collection-label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 13px;
+}
+
+.collection-value {
+  font-weight: bold;
+  font-size: 14px;
+  color: #212529;
+}
+
+.collection-value.total-due {
+  color: #6c757d;
+}
+
+.collection-value.collected {
+  color: #28a745;
+}
+
+.collection-value.remaining {
+  color: #dc3545;
+}
+
+/* تحسين للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .collection-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .collection-value {
+    font-size: 13px;
+  }
+}
+
+/* 📊 تصميم التتبع اليومي المبسط */
+.daily-tracking-simple {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tracking-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.tracking-item-simple {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tracking-item-simple:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.tracking-icon {
+  font-size: 24px;
+  margin-left: 15px;
+  opacity: 0.8;
+}
+
+.tracking-content {
+  flex: 1;
+}
+
+.tracking-label-simple {
+  display: block;
+  font-weight: 500;
+  color: #495057;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.tracking-value-simple {
+  display: block;
+  font-weight: bold;
+  font-size: 20px;
+  color: #212529;
+}
+
+.daily-amount {
+  color: #007bff;
+}
+
+.cumulative-actual {
+  color: #28a745;
+}
+
+.tracking-separator {
+  color: #dee2e6;
+  font-weight: bold;
+  margin: 0 4px;
+}
+
+.achievement-rate {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.achievement-rate.positive {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.achievement-rate.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.achievement-rate.negative {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* تحسين للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .tracking-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .tracking-item-simple {
+    padding: 12px;
+  }
+  
+  .tracking-value-simple {
+    font-size: 18px;
+  }
+  
+  .tracking-icon {
+    font-size: 20px;
+    margin-left: 10px;
+  }
+}
+
+/* ===== Analytics UI - copied from financial-analytics.html (core look & feel) ===== */
+.analytics-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.analytics-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.analytics-header h1 { margin: 0; font-size: 2.2rem; font-weight: 700; }
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.analytics-card, .card-like, .section {
+  background: white;
+  border-radius: 15px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.analytics-card:hover, .card-like:hover, .section:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+
+.card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+.card-title { font-size:1.1rem; font-weight:700; color:#2d3748; display:flex; align-items:center; gap:0.5rem; }
+.card-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.1rem; }
+.icon-revenue { background: linear-gradient(135deg, #667eea, #764ba2); }
+.icon-collection { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.icon-growth { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.icon-budget { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+.metric-value { font-size: 2rem; font-weight: 800; color: #2d3748; margin-bottom: 0.25rem; }
+.metric-label { color: #718096; font-size: 0.95rem; margin-bottom: 0.75rem; }
+
+.btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 18px; border-radius:10px; cursor:pointer; font-weight:700; font-size:15px; box-shadow: 0 8px 20px rgba(102,126,234,0.12); }
+.btn-secondary { background:#eef2f7; color:#374151; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600; font-size:14px; }
+
+.data-table { width:100%; border-collapse:collapse; margin-top: 1rem; }
+.data-table th, .data-table td { padding: 0.75rem; text-align: right; border-bottom: 1px solid #e2e8f0; }
+.data-table thead th { background: #f7fafc; font-weight:600; color:#4a5568; }
+.data-table tr:hover { background:#f7fafc; }
+
+.modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index:1000; }
+.modal-content { position: absolute; top:50%; left:50%; transform: translate(-50%,-50%); background: white; border-radius: 12px; padding: 1.5rem; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+.modal-title { font-size:1.25rem; font-weight:700; color:#2d3748; }
+.modal-close { background:none; border:none; font-size:22px; color:#718096; cursor:pointer; }
+
+.loading-spinner { display:inline-block; width:20px; height:20px; border:3px solid #f3f3f3; border-top:3px solid #667eea; border-radius:50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem; }
+.alert-success { background:#c6f6d5; color:#22543d; border:1px solid #9ae6b4; }
+.alert-warning { background:#fefcbf; color:#744210; border:1px solid #f6e05e; }
+.alert-danger { background:#fed7d7; color:#742a2a; border:1px solid #fc8181; }
+
+/* small responsive tweaks for analytics look */
+@media (max-width: 768px) {
+  .analytics-grid { grid-template-columns: 1fr; }
+  .modal-content { width: 95%; padding: 1rem; }
+}
+
+/* End analytics UI block */
+
+/* ===== Enhancements: selects, buttons, sidebars, icons animation ===== */
+
+/* Unified form inputs */
+.form-input {
+  padding: 10px 12px;
+  border: 1.8px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+.form-input:focus { outline: none; border-color: #667eea; box-shadow: 0 6px 18px rgba(102,126,234,0.08); transform: translateY(-1px); }
+
+/* nicer select arrow using inline SVG */
+select.form-input {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23667eea' d='M6 8L0 0h12z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 34px;
+}
+
+/* buttons interactions */
+.btn-primary, .btn-secondary {
+  transition: transform 0.14s cubic-bezier(.2,.9,.2,1), box-shadow 0.14s cubic-bezier(.2,.9,.2,1), opacity 0.12s ease;
+}
+.btn-primary:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(102,126,234,0.18); }
+.btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(15,23,42,0.06); }
+.btn-primary:active, .btn-secondary:active { transform: translateY(0); box-shadow: 0 8px 18px rgba(0,0,0,0.06); }
+
+/* small icon placement inside primary buttons */
+.btn-primary .card-icon.small, .btn-with-icon .card-icon.small { margin-inline-start: 6px; margin-inline-end: 6px; }
+
+/* Multiselect option styles */
+.custom-multiselect .options-list label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+.custom-multiselect .options-list label:hover { background: #f1f5f9; transform: translateX(-4px); }
+.custom-multiselect .options-list input[type="checkbox"] { transform: scale(1.12); }
+
+/* ensure selects display arrow with consistent color */
+select.form-input { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23667eea' d='M6 8L0 0h12z'/></svg>"); background-position: right 12px center; }
+
+/* sidebar look */
+.card-like[style] { /* preserve inline styles but harmonize */
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+.card-like h4, .card-like h5 { color: #2d3748; }
+
+/* small animated badge for icons */
+.card-icon.floating { animation: none; }
+
+/* ensure tables have comfortable spacing */
+.data-table td { vertical-align: middle; }
+
+/* subtle entrance for cards */
+.analytics-card, .card-like { will-change: transform, opacity; }
+.analytics-card.show, .card-like.show { animation: cardIn 380ms cubic-bezier(0.2,0.9,0.3,1); }
+@keyframes cardIn { from { transform: translateY(6px); opacity: 0.02; } to { transform: translateY(0); opacity: 1; } }
+
+/* small helper for icon next to headings */
+.heading-with-icon { display:flex; align-items:center; gap:10px; }
+.heading-with-icon .card-icon { flex: 0 0 auto; }
+
+/* ensure small variant for card-icon used by scripts */
+.card-icon.small {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* helper class for buttons that include an icon */
+.btn-with-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  justify-content: center;
+}
+
+/* make sure small icon inside buttons looks balanced */
+.btn-with-icon .card-icon.small, .btn-with-icon .colored-icon.small {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+/* Tighter multiselect / dropdown visuals to match analytics look */
+.custom-multiselect .select-box {
+  border: 1.5px solid rgba(66, 77, 105, 0.08);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: linear-gradient(180deg,#ffffff,#fbfdff);
+  box-shadow: 0 6px 16px rgba(46,64,83,0.04);
+  min-width: 120px;
+}
+
+.custom-multiselect .options-list {
+  border: 1.5px solid rgba(66, 77, 105, 0.06);
+  border-radius: 10px;
+  padding: 8px;
+  background: #fff;
+}
+
+/* ensure selects use form-input look */
+select.form-input, input.form-input, textarea.form-input { background: white; }
+
+/* small utility for heading icon spacing in RTL */
+.heading-with-icon { gap: 12px; }
+
+
+
+/* ===== Shared analytics / card icon styles (for index & login pages) ===== */
+.card-like {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-like:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(0,0,0,0.09); }
+
+.colored-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+}
+.colored-icon.small { width: 38px; height: 38px; font-size: 16px; border-radius: 8px; }
+
+.icon-grad-blue { background: linear-gradient(135deg, #667eea, #764ba2); }
+.icon-grad-green { background: linear-gradient(135deg, #38a169, #2bb673); }
+.icon-grad-cyan { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.icon-grad-orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
+
+/* helper to replace emoji look in places where markup contains emoji text */
+.emoji-replace { font-size: 0; line-height: 0; }
+.emoji-replace i { font-size: 20px; line-height: initial; font-size: inherit; }
+
+/* login page overrides to match analytics look */
+.login-container {
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+.login-container .logo-icon { width: 90px; height: 90px; border-radius: 18px; }
+.login-container .logo-icon i { font-size: 36px; color: white; }
+
+/* ===== Sidebar & System Settings polish to match Analytics look ===== */
+/* Make side panels feel like cards from analytics: consistent padding, rounded, shadows */
+#userProfileSection, #systemSettingsSection {
+  width: 380px; /* slightly narrower for visual balance */
+  border-radius: 14px;
+  padding: 18px !important;
+  background: linear-gradient(180deg,#ffffff,#fbfdff);
+  box-shadow: 0 18px 40px rgba(2,6,23,0.08);
+  border: 1px solid rgba(34,47,62,0.06);
+}
+
+#userProfileSection .card-icon, #systemSettingsSection .card-icon {
+  box-shadow: 0 6px 18px rgba(46,64,83,0.06);
+}
+
+/* Sidebar headings inside panels */
+#userProfileSection h4, #systemSettingsSection h4, #userProfileSection h5, #systemSettingsSection h5 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+/* Make buttons inside side panels match analytics buttons */
+#userProfileSection button, #systemSettingsSection button {
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  font-weight: 600;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+#userProfileSection .btn-with-icon, #systemSettingsSection .btn-with-icon { gap: 10px; }
+
+/* Primary/secondary styling for common actions in settings */
+#systemSettingsSection button[onclick*="autoDetectTimezone"],
+#systemSettingsSection button[onclick*="refreshCurrencyDisplay"],
+#systemSettingsSection button[onclick*="saveSystemSettings"] {
+  color: white !important;
+}
+
+#systemSettingsSection button[onclick*="autoDetectTimezone"] { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+#systemSettingsSection button[onclick*="updateCurrencyFromTimezone"] { background: linear-gradient(135deg,#38a169,#2bb673); color: #fff; }
+#systemSettingsSection button[onclick*="reloadSystemSettings"] { background: linear-gradient(135deg,#ffb347,#ff7b6b); color: #fff; }
+
+/* Tidy the small informational boxes inside settings */
+/* تم إلغاء هذا CSS لأنه يؤثر على Header و Footer */
+
+/* System info monospace area - subtle polish */
+#systemSettingsSection #systemInfo {
+  background: linear-gradient(180deg,#ffffff,#f7fbff);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e9f2ff;
+}
+
+/* Make nested permissions look even closer to analytics cards */
+.nested-permissions .main-permission {
+  background: linear-gradient(180deg,#fff,#fbfdff);
+  border: 1px solid #e6eefc;
+}
+
+/* ensure headings with icons inside panels are aligned */
+.card-like .heading-with-icon, #userProfileSection .heading-with-icon, #systemSettingsSection .heading-with-icon { gap: 10px; align-items: center; }
+
+/* mobile tweak: full width panels */
+@media (max-width: 900px) {
+  #userProfileSection, #systemSettingsSection { width: 100% !important; left: 0 !important; right: 0 !important; }
+}
+
+/* ===== System Settings specific layout & controls ===== */
+#systemSettingsSection {
+  --panel-pad: 16px;
+  --muted: #6c757d;
+}
+
+/* layout for individual setting rows */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.setting-row + .setting-row { margin-top: 10px; }
+
+.setting-row label { margin: 0; color: #344054; font-weight: 600; font-size: 14px; }
+.setting-row .control { min-width: 180px; max-width: 220px; }
+
+/* Make inputs/selects inside system settings use main form-input look */
+#systemSettingsSection input, #systemSettingsSection select, #systemSettingsSection textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Override for primary/secondary buttons inside the settings panel to match analytics colors */
+#systemSettingsSection .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2) !important; color: #fff !important; border: none !important; box-shadow: 0 12px 30px rgba(102,126,234,0.12) !important; }
+#systemSettingsSection .btn-secondary { background: #eef2f7 !important; color: #374151 !important; border: 1px solid #e6eefc !important; }
+
+/* small icon adjustment for settings buttons */
+#systemSettingsSection .card-icon.small { width: 34px; height: 34px; font-size: 14px; }
+
+/* action group inside panel */
+.panel-actions { display:flex; flex-direction:column; gap:10px; }
+
+/* subtle divider between logical groups */
+.panel-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.04), transparent); margin: 12px 0; border-radius: 2px; }
+
+/* align the headings inside the panel to have consistent contrast */
+#systemSettingsSection h5, #systemSettingsSection h4 { color: #2d3748; }
+
+/* ===== Table Modals بعرض كامل ===== */
+.table-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.modal-content-table {
+  position: relative;
+  width: 95vw;
+  max-width: 1400px;
+  height: 90vh;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* أنيميشن خاص للنوافذ المركزية مع translate(-50%, -50%) */
+@keyframes modalSlideInCentered {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+}
+
+.modal-header-table {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header-table h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-header-table h3 i {
+  font-size: 24px;
+}
+
+.close-modal-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 20px;
+}
+
+.close-modal-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+.modal-body-table {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background: #f8f9fa;
+}
+
+.modal-body-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.modal-body-table table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.modal-body-table table th {
+  padding: 16px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-body-table table td {
+  padding: 14px 16px;
+  text-align: right;
+  border-bottom: 1px solid #e9ecef;
+  color: #495057;
+  font-size: 14px;
+}
+
+.modal-body-table table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.modal-body-table table tbody tr:hover {
+  background: #f1f3f5;
+}
+
+.modal-body-table table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* responsive للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .modal-content-table {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  
+  .modal-header-table {
+    padding: 15px 20px;
+  }
+  
+  .modal-header-table h3 {
+    font-size: 18px;
+  }
+  
+  .modal-body-table {
+    padding: 20px 15px;
+  }
+  
+  .modal-body-table table th,
+  .modal-body-table table td {
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+}
+
+
+
+

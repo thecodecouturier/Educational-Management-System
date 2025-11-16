@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>Educational Management System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+  <!-- Overrides: unify index page UI to analytics theme (style-only, no structure/scripts changes) -->
+  <style id="analytics-theme-overrides">
+    /* Navbar secondary buttons to analytics look */
+    #mainNavbar .btn-secondary:not(#admin-section-btn):not(#reception-registration-section-btn):not(#attendance-section-btn) {
+      background: #eef2f7 !important;
+      color: #1f2937 !important;
+      border: none !important;
+      padding: 10px 14px !important;
+      border-radius: 10px !important;
+      font-weight: 600 !important;
+      box-shadow: 0 8px 22px rgba(15,23,42,0.06) !important;
+    }
+    #mainNavbar .btn-secondary:not(#admin-section-btn):not(#reception-registration-section-btn):not(#attendance-section-btn):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.08) !important;
+      background: #e5e9f2 !important;
+    }
+
+    /* Primary buttons unified */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2) !important;
+      color: #fff !important;
+      border: none !important;
+      padding: 12px 18px !important;
+      border-radius: 10px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 12px 30px rgba(102,126,234,0.12) !important;
+    }
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(102,126,234,0.18) !important;
+    }
+
+    /* Inputs & selects */
+    .analytics-container input.form-input,
+    .analytics-container select.form-input,
+    .analytics-container textarea.form-input {
+      border: 1.8px solid #e2e8f0 !important;
+      border-radius: 8px !important;
+      background: #fff !important;
+      padding: 10px 12px !important;
+      font-size: 14px !important;
+      box-shadow: 0 0 0 rgba(0,0,0,0) !important;
+    }
+    .analytics-container input.form-input:focus,
+    .analytics-container select.form-input:focus,
+    .analytics-container textarea.form-input:focus {
+      border-color: #667eea !important;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1) !important;
+    }
+
+    /* Select arrow */
+    .analytics-container select.form-input {
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23667eea' d='M6 8L0 0h12z'/></svg>") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      padding-right: 34px !important;
+    }
+
+    /* Tables */
+    .analytics-container table.data-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+    }
+    .analytics-container table.data-table thead th {
+      background: #f7fafc !important;
+      color: #4a5568 !important;
+      font-weight: 600 !important;
+    }
+    .analytics-container table.data-table th,
+    .analytics-container table.data-table td {
+      padding: 12px !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      text-align: center !important;
+    }
+
+    /* Buttons with icons alignment */
+    .btn-with-icon { display: inline-flex !important; align-items: center !important; gap: 8px !important; }
+    .btn-with-icon .card-icon.small { width: 30px; height: 30px; font-size: 14px; }
+
+    /* ===== Side panels (user profile / system settings) to analytics theme ===== */
+    #userProfileSection, #systemSettingsSection {
+      background: linear-gradient(180deg,#ffffff,#fbfdff) !important;
+      border: 1px solid rgba(34,47,62,0.06) !important;
+      box-shadow: 0 18px 40px rgba(2,6,23,0.08) !important;
+      border-radius: 14px !important;
+      padding: 18px !important;
+    }
+    /* headings inside panels */
+    #userProfileSection h4, #systemSettingsSection h4,
+    #userProfileSection h5, #systemSettingsSection h5 {
+      color: #2d3748 !important;
+      font-weight: 700 !important;
+    }
+    
+    /* توسيط نص معلومات المستخدم */
+    #sidebarUserInfo #sidebarUserName,
+    #sidebarUserInfo #sidebarUserRole,
+    #userProfileSection #sidebarUserName,
+    #userProfileSection #sidebarUserRole {
+      text-align: center !important;
+      direction: ltr !important;
+      width: 100% !important;
+      display: block !important;
+    }
+    
+    /* system settings header: add spacing for icon + text alignment */
+    #systemSettingsSection h4 { display: flex; align-items: center; gap: 8px; margin: 0 !important; }
+    
+    /* panel overlays */
+    #userProfileOverlay, #systemSettingsOverlay {
+      background-color: rgba(0,0,0,0.45) !important;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ===== Modals to analytics theme ===== */
+    /* Export modal */
+    #exportModal {
+      background-color: rgba(0,0,0,0.5) !important;
+      backdrop-filter: blur(2px);
+    }
+    #exportModal .modal-content {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+      background: #ffffff !important;
+    }
+    /* header inside export modal (first child) */
+    #exportModal .modal-content > div:first-child {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    /* Payment reports lightbox */
+    #paymentReportsOverlay {
+      background-color: rgba(0,0,0,0.5) !important;
+      backdrop-filter: blur(2px);
+    }
+    #paymentReportsSection {
+      background: #ffffff !important;
+      border-radius: 15px !important;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+      overflow: hidden !important;
+    }
+    /* payment reports header bar */
+    #paymentReportsSection > div:first-child {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    /* payment report table header area */
+    #paymentReportTableContainer > div:first-child {
+      background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+    }
+
+    /* ===== System Settings panel refinements ===== */
+    /* Action buttons inside system settings */
+    #systemSettingsSection button[onclick*="autoDetectTimezone"] {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+      color: #ffffff !important; border: none !important; border-radius: 10px !important;
+      box-shadow: 0 10px 22px rgba(6,182,212,0.18) !important; font-weight: 700 !important;
+    }
+    #systemSettingsSection button[onclick*="reloadSystemSettings"] {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
+      color: #ffffff !important; border: none !important; border-radius: 10px !important;
+      box-shadow: 0 10px 22px rgba(59,130,246,0.18) !important; font-weight: 700 !important;
+    }
+    #systemSettingsSection .panel-actions button:hover { transform: translateY(-2px); }
+
+    /* Card-like look for inner sections while keeping their themed backgrounds */
+    /* تم إلغاء هذا CSS لأنه يؤثر على Header و Footer */
+
+    /* Sticky footer buttons in system settings */
+    #systemSettingsSection > div[style*="bottom: 0"] button[onclick*="saveSystemSettings"] {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+      color: #ffffff !important; border: none !important; border-radius: 10px !important;
+      font-weight: 800 !important; box-shadow: 0 10px 22px rgba(34,197,94,0.18) !important;
+    }
+    #systemSettingsSection > div[style*="bottom: 0"] button[onclick*="hideSystemSettings"] {
+      background: linear-gradient(135deg, #9aa5b1 0%, #6b7280 100%) !important;
+      color: #ffffff !important; border: none !important; border-radius: 10px !important;
+      font-weight: 700 !important; box-shadow: 0 8px 18px rgba(107,114,128,0.18) !important;
+    }
+
+    /* ===== إخفاء أزرار المدراء افتراضياً حتى يتم التحقق من الصلاحيات ===== */
+    #sidebar-user-management-btn,
+    #sidebar-financial-analytics-btn,
+    #sidebar-system-settings-btn {
+      display: none !important;
+    }
+
+    /* ===== توحيد كل أزرار القائمة الجانبية على نمط "تعديل المعلومات الشخصية" ===== */
+    /* استهداف كل الأزرار داخل قائمة الملف الشخصي باستثناء زر الإغلاق العلوي وزر تسجيل الخروج */
+    #userProfileSection button:not([onclick*="hideUserProfile"]):not([onclick*="logout"]) {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+      color: #495057 !important;
+      border: 1px solid #dee2e6 !important;
+      padding: 12px 15px !important;
+      border-radius: 8px !important;
+      width: 100% !important;
+      text-align: start !important; /* يتكيف تلقائياً مع RTL/LTR */
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+      margin-bottom: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      transform: none !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer !important;
+    }
+    #userProfileSection button:not([onclick*="hideUserProfile"]):not([onclick*="logout"]):hover {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+      box-shadow: 0 4px 12px rgba(0,123,255,0.15) !important;
+      transform: translateY(-1px) !important;
+      border-color: #007bff !important;
+    }
+    #userProfileSection button:not([onclick*="hideUserProfile"]):not([onclick*="logout"]):active {
+      transform: translateY(0) !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* تطبيق نفس الاستايل على أزرار قائمة إعدادات النظام */
+    #systemSettingsSection button:not([onclick*="hideSystemSettings"]) {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+      color: #495057 !important;
+      border: 1px solid #dee2e6 !important;
+      padding: 12px 15px !important;
+      border-radius: 8px !important;
+      text-align: start !important;
+      width: 100% !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+      margin-bottom: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      transform: none !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer !important;
+    }
+    #systemSettingsSection button:not([onclick*="hideSystemSettings"]):hover {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+      box-shadow: 0 4px 12px rgba(0,123,255,0.15) !important;
+      transform: translateY(-1px) !important;
+      border-color: #007bff !important;
+    }
+    #systemSettingsSection button:not([onclick*="hideSystemSettings"]):active {
+      transform: translateY(0) !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* ضبط الأيقونات داخل أزرار القائمة الجانبية */
+    #userProfileSection button .card-icon,
+    #systemSettingsSection button .card-icon {
+      order: -1; /* الأيقونة دائماً في البداية بغض النظر عن الاتجاه */
+      margin-inline-end: 0 !important;
+      margin-inline-start: 0 !important;
+      flex-shrink: 0;
+    }
+    
+    /* ضبط النصوص داخل الأزرار */
+    #userProfileSection button span:not(.card-icon),
+    #systemSettingsSection button span:not(.card-icon) {
+      flex: 1;
+      text-align: inherit;
+    }
+    
+    /* تخصيص زر تسجيل الخروج */
+    #userProfileSection button[onclick*="logout"] {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+      color: white !important;
+      border: none !important;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3) !important;
+      font-weight: bold !important;
+      justify-content: center !important;
+      padding: 14px 20px !important;
+      font-size: 15px !important;
+      margin-bottom: 0px !important;
+      width: 300px !important;
+    }
+    #userProfileSection button[onclick*="logout"]:hover {
+      background: linear-gradient(135deg, #c82333 0%, #bd2130 100%) !important;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4) !important;
+      transform: translateY(-2px) !important;
+    }
+    #userProfileSection button[onclick*="logout"]:active {
+      transform: translateY(0) !important;
+    }
+    
+    /* تخصيص زر حفظ الإعدادات - أخضر ومتوسط ومطابق لزر تسجيل الخروج */
+    #systemSettingsSection button[onclick*="saveSystemSettings"] {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+      color: white !important;
+      border: none !important;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+      font-weight: bold !important;
+      justify-content: center !important;
+      padding: 14px 20px !important;
+      font-size: 15px !important;
+      margin-bottom: 0 !important;
+      width: 300px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      text-align: center !important;
+    }
+    #systemSettingsSection button[onclick*="saveSystemSettings"] i {
+      font-size: 16px !important;
+      line-height: 1 !important;
+    }
+    #systemSettingsSection button[onclick*="saveSystemSettings"]:hover {
+      background: linear-gradient(135deg, #218838 0%, #1aa87f 100%) !important;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4) !important;
+      transform: translateY(-2px) !important;
+    }
+    #systemSettingsSection button[onclick*="saveSystemSettings"]:active {
+      transform: translateY(0) !important;
+    }
+    
+    /* تحسين زر الإغلاق */
+    #userProfileSection button[onclick*="hideUserProfile"],
+    #systemSettingsSection button[onclick*="hideSystemSettings"] {
+      background-color: #dc3545 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 50% !important;
+      width: 30px !important;
+      height: 30px !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 16px !important;
+      transition: all 0.2s ease !important;
+    }
+    #userProfileSection button[onclick*="hideUserProfile"]:hover,
+    #systemSettingsSection button[onclick*="hideSystemSettings"]:hover {
+      background-color: #c82333 !important;
+      transform: rotate(90deg) !important;
+    }
+    #userProfileSection button[onclick*="hideUserProfile"]:active,
+    #systemSettingsSection button[onclick*="hideSystemSettings"]:active {
+      transform: rotate(90deg) scale(0.95) !important;
+    }
+    
+    /* تنسيق أيقونات إظهار/إخفاء كلمة المرور */
+    .toggle-password-icon:hover {
+      color: #007bff !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🎨 خلفية ديناميكية -->
+  <div class="pattern-bg" id="patternBackground"></div>
+  
+  <!-- 🚀 شريط التنقل الرئيسي (Navbar) -->
+  <nav id="mainNavbar" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+  ">
+    <!-- اللوجو وعنوان النظام -->
+    <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
+      <div style="
+        width: 45px; 
+        height: 45px; 
+        background: linear-gradient(45deg, #ffffff 0%, #e3f2fd 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 2px 8px rgba(255,255,255,0.2);
+      "><i class="fa-solid fa-graduation-cap" style="color:#0056b3; font-size:20px;"></i></div>
+      <div>
+        <h1 style="
+          margin: 0; 
+          color: white; 
+          font-size: 22px; 
+          font-weight: bold;
+          text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        ">نظام إدارة تعليمى</h1>
+        <p style="
+          margin: 0; 
+          color: rgba(255,255,255,0.8); 
+          font-size: 12px;
+          margin-top: 2px;
+        ">Educational Management System</p>
+      </div>
+    </div>
+
+    <!-- قائمة التنقل الرئيسية - متوسطة -->
+    <div style="display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center;">
+      <button type="button" id="admin-section-btn" class="btn-secondary btn-with-icon" onclick="scrollToSection('resources-admin-section')" style="
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+  <span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-user-gear"></i></span>
+        الإدارة
+      </button>
+      
+      <button type="button" id="reception-registration-section-btn" class="btn-secondary btn-with-icon" onclick="scrollToSection('reception-registration-section')" style="
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+  <span class="card-icon small icon-grad-green"><i class="fa-solid fa-user-plus"></i></span>
+        التسجيل
+      </button>
+      
+      <button type="button" id="attendance-section-btn" class="btn-secondary btn-with-icon" onclick="scrollToSection('attendance-section')" style="
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+        <span class="card-icon small icon-grad-blue"><i class="fa-solid fa-calendar-check"></i></span>
+        الحضور
+      </button>
+    </div>
+
+    <!-- منطقة معلومات المستخدم - جهة اليسار -->
+    <div style="display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end;">
+    </div>
+  </nav>
+
+  <!-- إضافة مساحة للمحتوى تحت الـ navbar -->
+  <div style="height: 90px;"></div>
+  <div class="analytics-container">
+
+  <!-- المحتوى الرئيسي بدون العنوان القديم -->
+  
+  <!-- 👤 قائمة الملف الشخصي الجانبية من اليسار -->
+  <div id="userProfileSection" class="card-like" style="
+    position: fixed;
+    top: 0;
+    left: -400px;
+    width: 400px;
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 2px solid #28a745;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  ">
+    <!-- رأس القائمة - جزء ثابت -->
+    <div style="background-color: #ffffff; padding: 15px 20px; border-bottom: 2px solid #e9ecef; flex-shrink: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h4 class="heading-with-icon" style="color: #28a745; margin: 0; font-size: 18px;"><span class="card-icon small icon-grad-cyan" style="margin-inline-start:8px;"><i class="fa-solid fa-user"></i></span> الملف الشخصي</h4>
+        <button type="button" onclick="hideUserProfile()" class="btn-with-icon" style="
+          background-color: #dc3545; 
+          color: white; 
+          border: none; 
+          border-radius: 50%; 
+          width: 30px; 
+          height: 30px; 
+          cursor: pointer; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+          font-size: 16px;
+        "><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+    </div>
+
+    <!-- محتوى القائمة القابل للتمرير -->
+    <div style="flex: 1; overflow-y: auto; padding: 10px;">
+    <!-- معلومات المستخدم -->
+    <div id="sidebarUserInfo" style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%); border-radius: 12px; text-align: center;">
+      <div style="
+        width: 80px; 
+        height: 80px; 
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+        font-size: 35px;
+        box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+      "><i class="fa-solid fa-user" style="color: white; font-size:34px;"></i></div>
+      <h5 id="sidebarUserName" style="margin: 0 0 5px 0; color: #495057; font-size: 18px; display: flex; justify-content: center; width: 100%;">جاري التحميل...</h5>
+      <p id="sidebarUserRole" style="margin: 0; color: #6c757d; font-size: 14px; display: flex; justify-content: center; width: 100%;">...</p>
+    </div>
+
+    <!-- خيارات الملف الشخصي -->
+    <div>      
+    <button type="button" onclick="showEditProfileForm()">
+      <span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-user-pen"></i></span>
+      <span>تعديل المعلومات الشخصية</span>
+    </button>
+      
+    <button type="button" onclick="showChangePasswordForm()">
+      <span class="card-icon small icon-grad-orange"><i class="fa-solid fa-key"></i></span>
+      <span>تغيير كلمة المرور</span>
+    </button>
+      
+      <button type="button" id="sidebar-system-settings-btn" onclick="showSystemSettings()">
+        <span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-gear"></i></span>
+        <span>إعدادات النظام</span>
+      </button>
+    </div>
+
+    <!-- التحليلات المالية المتقدمة -->
+    <button type="button" id="sidebar-financial-analytics-btn" onclick="window.location.href='financial-analytics.html'">
+      <span class="card-icon small icon-grad-orange"><i class="fa-solid fa-chart-pie"></i></span>
+      <span>التحليلات المالية المتقدمة</span>
+    </button>
+
+    <!-- إدارة المستخدمين -->
+    <button type="button" id="sidebar-user-management-btn" onclick="window.location.href='users.html'">
+      <span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-users-gear"></i></span>
+      <span>إدارة المستخدمين</span>
+    </button>
+    </div>
+    
+    <!-- Footer ثابت في الأسفل - زر تسجيل الخروج -->
+    <div style="background-color: #ffffff; padding: 15px 20px; border-top: 1px solid #e9ecef; flex-shrink: 0;">
+      <button type="button" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket" style="font-size: 16px;"></i>
+        <span>تسجيل الخروج</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- طبقة خلفية للملف الشخصي -->
+  <div id="userProfileOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+  " onclick="hideUserProfile()"></div>
+  
+  <!-- ⚙️ قائمة إعدادات النظام الجانبية -->
+  <div id="systemSettingsSection" style="
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background-color: #ffffff;
+    border-left: 2px solid #007bff;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  ">
+    <!-- Header ثابت -->
+    <div class="sidebar-header" style="background-color: #ffffff; padding: 15px 20px; border-bottom: 2px solid #e9ecef; flex-shrink: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h4 style="color: #007bff; margin: 0; font-size: 18px;"> إعدادات النظام</h4>
+        <button type="button" onclick="hideSystemSettings()" class="btn-with-icon" style="
+          background-color: #dc3545; 
+          color: white; 
+          border: none; 
+          border-radius: 50%; 
+          width: 30px; 
+          height: 30px; 
+          cursor: pointer; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+          font-size: 16px;
+        "><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+    </div>
+
+    <!-- محتوى القائمة القابل للتمرير -->
+    <div class="sidebar-content" style="flex: 1; overflow-y: auto; padding: 10px;">
+    <div>
+    <!-- أزرار التحكم -->
+    <button type="button" onclick="autoDetectTimezone()">
+      <span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-magnifying-glass"></i></span>
+      <span>كشف تلقائي للمنطقة الزمنية والعملة</span>
+    </button>
+    
+    <button type="button" onclick="reloadSystemSettings()">
+      <span class="card-icon small icon-grad-blue"><i class="fa-solid fa-sync"></i></span>
+      <span>إعادة تحميل الإعدادات</span>
+    </button>
+    </div>
+    
+    <!-- إعدادات المؤسسة -->
+    <div class="settings-card" style="margin-bottom: 25px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+      <h5 class="heading-with-icon" style="color: #495057; margin-bottom: 15px; font-size: 16px;"><span class="card-icon small icon-grad-orange"><i class="fa-solid fa-school"></i></span>إعدادات المؤسسة</h5>
+      
+      <div class="setting-row" style="margin-bottom: 15px;">
+        <label for="institutionName">اسم المؤسسة:</label>
+        <div class="control"><input type="text" id="institutionName" placeholder="مدرسة الأمل" class="form-input"></div>
+      </div>
+      
+      <div class="setting-row" style="margin-bottom: 15px;">
+        <label for="institutionTimezone">المنطقة الزمنية:</label>
+        <div class="control"><select id="institutionTimezone" class="form-input"><option value="">جاري التحميل...</option></select></div>
+      </div>
+    </div>
+    
+    <!-- معلومات النظام -->
+    <div class="settings-card" style="margin-bottom: 25px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+      <h5 class="heading-with-icon" style="color: #495057; margin-bottom: 12px; font-size: 16px;"><span class="card-icon small icon-grad-blue"><i class="fa-solid fa-chart-simple"></i></span>معلومات النظام</h5>
+      <div id="systemInfo" style="
+        font-family: 'Courier New', monospace; 
+        font-size: 12px; 
+        color: #555; 
+        line-height: 1.6;
+        white-space: pre-wrap;
+        max-height: 200px;
+        overflow-y: auto;
+      ">
+        جاري التحميل...
+      </div>
+    </div>
+    </div>
+    
+    <!-- Footer ثابت -->
+    <div class="sidebar-footer" style="background-color: #ffffff; padding: 15px 20px; border-top: 1px solid #e9ecef; flex-shrink: 0;">
+      <button type="button" onclick="saveSystemSettings()">
+        <i class="fa-solid fa-circle-check" style="font-size: 16px;"></i>
+        <span>حفظ الإعدادات</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- طبقة خلفية للقائمة الجانبية -->
+  <div id="systemSettingsOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+  " onclick="hideSystemSettings()"></div>
+  
+  <div class="section" id="resources-admin-section">
+  <h2 class="heading-with-icon" style="text-align:center;margin-bottom:24px;"><span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-user-gear"></i></span>الإدارة العامة للموارد</h2>
+    <div class="sub-section" id="subject-admin-section">
+  <h3 class="heading-with-icon" style="text-align:right;margin-bottom:12px;"><span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-book"></i></span>إضافة مادة</h3>
+      <form id="addSubjectForm">
+        <div style="display:flex;align-items:center;width:100%;gap:15px;flex-wrap:wrap;">
+          <input type="text" id="subjectName" placeholder="اسم المادة" style="width:150px;min-width:110px;">
+          <div class="custom-multiselect" id="customLevels" style="min-width:140px;">
+            <div class="select-box">اختر المستوى</div>
+            <div class="options-list">
+              <label><input type="checkbox" value="ابتدائى"> ابتدائى</label>
+              <label><input type="checkbox" value="اعدادى"> اعدادى</label>
+              <label><input type="checkbox" value="ثانوى"> ثانوى</label>
+            </div>
+          </div>
+          <div class="custom-multiselect" id="customClasses" style="min-width:140px;">
+            <div class="select-box">اختر الصف</div>
+            <div class="options-list">
+              <label><input type="checkbox" value="الأول"> الأول</label>
+              <label><input type="checkbox" value="الثانى"> الثانى</label>
+              <label><input type="checkbox" value="الثالث"> الثالث</label>
+              <label><input type="checkbox" value="الرابع"> الرابع</label>
+              <label><input type="checkbox" value="الخامس"> الخامس</label>
+              <label><input type="checkbox" value="السادس"> السادس</label>
+            </div>
+          </div>
+          <button type="submit" style="margin-left:10px;">إضافة</button>
+          <button type="button" onclick="showSubjectsModal()" class="btn-secondary" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; white-space: nowrap;">
+            <i class="fa-solid fa-list"></i> عرض المواد
+          </button>
+        </div>
+      </form>
+      <table id="subjectsTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>اسم المادة</th>
+            <th>المستويات</th>
+            <th>الصفوف</th>
+            <th>الأكشن</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- سيتم عرض المواد هنا -->
+        </tbody>
+      </table>
+    </div>
+    <div class="sub-section card-like" id="teacher-admin-section">
+      <h3 class="heading-with-icon" style="text-align:right;margin-bottom:12px;"><span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-chalkboard-user"></i></span>إضافة أستاذ</h3>
+      <form id="addTeacherForm">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;width:100%;">
+          <input type="text" id="teacherFirstName" class="form-input" placeholder="الاسم الأول" style="width:120px;">
+          <input type="text" id="teacherLastName" class="form-input" placeholder="الاسم الأخير" style="width:120px;">
+          <div class="custom-multiselect" id="teacherLevels">
+            <div class="select-box">اختر المستوى</div>
+            <div class="options-list">
+              <label><input type="checkbox" value="ابتدائى"> ابتدائى</label>
+              <label><input type="checkbox" value="اعدادى"> اعدادى</label>
+              <label><input type="checkbox" value="ثانوى"> ثانوى</label>
+            </div>
+          </div>
+          <div class="custom-multiselect" id="teacherClasses">
+            <div class="select-box">اختر الصف</div>
+            <div class="options-list">
+              <label><input type="checkbox" value="الأول"> الأول</label>
+              <label><input type="checkbox" value="الثانى"> الثانى</label>
+              <label><input type="checkbox" value="الثالث"> الثالث</label>
+              <label><input type="checkbox" value="الرابع"> الرابع</label>
+              <label><input type="checkbox" value="الخامس"> الخامس</label>
+              <label><input type="checkbox" value="السادس"> السادس</label>
+            </div>
+          </div>
+          <select id="teacherSubject" class="form-input" style="width:140px;"><option value="">اختر المادة</option></select>
+          <textarea id="teacherNotes" class="form-input" placeholder="ملاحظات" style="width:220px;height:40px;"></textarea>
+          <button type="submit" class="btn-primary">إضافة</button>
+          <button type="button" onclick="showTeachersModal()" class="btn-secondary" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; white-space: nowrap;">
+            <i class="fa-solid fa-list"></i> عرض الأساتذة
+          </button>
+        </div>
+      </form>
+      <table id="teachersTable" class="data-table" style="display: none;">
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>المادة</th>
+            <th>المستويات</th>
+            <th>الصفوف</th>
+            <th>ملاحظات</th>
+            <th>الأكشن</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- سيتم عرض المدرسين هنا -->
+        </tbody>
+      </table>
+    </div>
+    <div class="sub-section" id="group-admin-section">
+  <h3 class="heading-with-icon" style="text-align:right;margin-bottom:12px;"><span class="card-icon small icon-grad-cyan"><i class="fa-solid fa-users"></i></span>إضافة مجموعة</h3>
+      <form id="addGroupForm">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;width:100%;margin-bottom:8px;">
+          <select id="groupLevelSelect" style="width:120px;">
+            <option value="">اختر المستوى</option>
+            <option value="ابتدائى">ابتدائى</option>
+            <option value="اعدادى">اعدادى</option>
+            <option value="ثانوى">ثانوى</option>
+          </select>
+          <select id="groupClassSelect" style="width:120px;">
+            <option value="">اختر الصف</option>
+            <option value="الأول">الأول</option>
+            <option value="الثانى">الثانى</option>
+            <option value="الثالث">الثالث</option>
+            <option value="الرابع">الرابع</option>
+            <option value="الخامس">الخامس</option>
+            <option value="السادس">السادس</option>
+          </select>
+          <select id="groupSubject" style="width:140px;"><option value="">اختر المادة</option></select>
+          <select id="groupTeacher" style="width:140px;"><option value="">اختر الأستاذ</option></select>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;margin-bottom:8px;">
+          <span style="margin-right:10px;">أيام المجموعة:</span>
+          <span id="groupDays" style="display:flex;gap:8px;align-items:center;">
+            <label><input type="checkbox" value="السبت"> السبت</label>
+            <label><input type="checkbox" value="الأحد"> الأحد</label>
+            <label><input type="checkbox" value="الاثنين"> الاثنين</label>
+            <label><input type="checkbox" value="الثلاثاء"> الثلاثاء</label>
+            <label><input type="checkbox" value="الأربعاء"> الأربعاء</label>
+            <label><input type="checkbox" value="الخميس"> الخميس</label>
+            <label><input type="checkbox" value="الجمعة"> الجمعة</label>
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;margin-bottom:8px;">
+          <input type="text" id="groupStartTime" style="width:110px;" placeholder="اختر وقت البداية">
+          <input type="text" id="groupEndTime" style="width:110px;" placeholder="اختر وقت النهاية">
+          <input type="number" id="groupPrice" style="width:120px;" placeholder="السعر (ج.م)" min="0" step="0.01">
+          <button type="submit">إضافة</button>
+        </div>
+        <!-- صف الأزرار الإضافية -->
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:15px;gap:15px;">
+          <button type="button" onclick="showGroupsModal()" class="btn-secondary" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; white-space: nowrap;">
+            <i class="fa-solid fa-list"></i> عرض المجموعات
+          </button>
+          <button type="button" onclick="showEmergencySection()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; white-space: nowrap;">
+            ⚠️ تحديث طارئ للمجموعة
+          </button>
+        </div>
+      </form>
+      <table id="groupsTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>المادة</th>
+            <th>الأستاذ</th>
+            <th>المستوى</th>
+            <th>الصف</th>
+            <th>الأيام</th>
+            <th>الوقت</th>
+            <th>السعر</th>
+            <th>الأكشن</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- سيتم عرض المجموعات هنا -->
+        </tbody>
+      </table>
+
+  <!-- 🚨 قسم الطوارئ -->
+  <div id="emergencySection" style="display: none; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 20px auto; max-width: 700px;">
+    <h4 style="color: #856404; margin-bottom: 20px; text-align: center;">⚠️ تحديث طارئ للشهر الحالي</h4>
+    
+    <!-- نظام التصفية المتدرج -->
+    <div style="background-color: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+      <h5 style="margin-bottom: 15px; color: #495057;">🔍 تحديد المجموعة:</h5>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+        <div>
+          <label for="emergencyLevel" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">المستوى:</label>
+          <select id="emergencyLevel" onchange="loadEmergencyClasses()" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+            <option value="">اختر المستوى...</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="emergencyClass" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">الصف:</label>
+          <select id="emergencyClass" onchange="loadEmergencySubjects()" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled>
+            <option value="">اختر الصف...</option>
+          </select>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+        <div>
+          <label for="emergencySubject" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">المادة:</label>
+          <select id="emergencySubject" onchange="loadEmergencyTeachers()" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled>
+            <option value="">اختر المادة...</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="emergencyTeacher" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">الأستاذ:</label>
+          <select id="emergencyTeacher" onchange="loadEmergencyGroups()" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;" disabled>
+            <option value="">اختر الأستاذ...</option>
+          </select>
+        </div>
+      </div>
+      
+      <div>
+        <label for="emergencyGroupSelect" style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">المجموعة النهائية:</label>
+        <select id="emergencyGroupSelect" style="width: 100%; padding: 8px; border: 2px solid #28a745; border-radius: 4px; background-color: #f8fff9;" disabled>
+          <option value="">ستظهر المجموعات هنا بعد اختيار الأستاذ...</option>
+        </select>
+      </div>
+      
+      <!-- عرض تفاصيل المجموعة المختارة -->
+      <div id="selectedGroupInfo" style="display: none; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; padding: 10px; margin-top: 15px;">
+        <strong>📋 تفاصيل المجموعة المختارة:</strong>
+        <div id="groupDetailsDisplay" style="margin-top: 8px; font-size: 14px;"></div>
+      </div>
+    </div>
+    
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 15px; font-size: 14px;">
+      <strong>📝 ملحوظة:</strong><br>
+      • يجب تغيير أيام المجموعة أولاً من الجدول أسفل<br>
+      • هذه العملية ستحافظ على الحضور المسجل في الماضي<br>
+      • وتُحدث الأيام المستقبلية بالأيام الجديدة فقط<br>
+      • ستُسأل عن تاريخ بداية التحديث (من اليوم أم من غداً)
+    </div>
+    
+    <div style="text-align: center;">
+      <button type="button" onclick="emergencyUpdate()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+         تنفيذ التحديث الطارئ
+      </button>
+      <button type="button" onclick="hideEmergencySection()" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+         إلغاء
+      </button>
+    </div>
+  </div>
+  
+    </div>
+  </div>
+  <div class="section" id="reception-registration-section" style="margin-top:40px;">
+    <h2 style="text-align:center;margin-bottom:24px;">الاستقبال والتسجيل</h2>
+    <div class="sub-section" id="student-registration-subsection">
+      <h3 style="text-align:right;margin-bottom:12px;">تسجيل الطالب</h3>
+      <form id="studentRegistrationForm">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <input type="text" id="studentFirstName" placeholder="الاسم الأول" style="width:120px;">
+          <input type="text" id="studentMiddleName" placeholder="الاسم الأوسط (نص حر)" style="width:140px;">
+          <input type="text" id="studentLastName" placeholder="الاسم الأخير" style="width:120px;">
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <select id="studentLevelSelect" style="width:120px;">
+            <option value="">اختر المستوى</option>
+            <option value="ابتدائى">ابتدائى</option>
+            <option value="اعدادى">اعدادى</option>
+            <option value="ثانوى">ثانوى</option>
+          </select>
+          <select id="studentClassSelect" style="width:120px;">
+            <option value="">اختر الصف</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label>رقم الهاتف:
+              <input type="text" id="studentPhone" placeholder="رقم الهاتف" style="width:140px;">
+            </label>
+            <button type="button" id="addStudentPhone" style="width:140px;">إضافة رقم آخر</button>
+            <div id="studentPhonesContainer"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label>رقم هاتف ولي الأمر:
+              <input type="text" id="guardianPhone" placeholder="رقم ولي الأمر" style="width:140px;">
+            </label>
+            <button type="button" id="addGuardianPhone" style="width:140px;">إضافة رقم آخر</button>
+            <div id="guardianPhonesContainer"></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <button type="submit">تسجيل</button>
+          <button type="button" onclick="showStudentsModal()" class="btn-secondary" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; white-space: nowrap;">
+            <i class="fa-solid fa-list"></i> عرض الطلاب
+          </button>
+        </div>
+      </form>
+      <table id="studentsTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>الاسم</th>
+            <th>المستوى</th>
+            <th>الصف</th>
+            <th>رقم الهاتف</th>
+            <th>رقم ولي الأمر</th>
+            <th>الأكشن</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- سيتم عرض الطلاب هنا -->
+        </tbody>
+      </table>
+    </div>
+    <div class="sub-section" id="student-subscription-subsection" style="margin-top:32px;">
+      <h3 style="text-align:right;margin-bottom:12px;">إدارة اشتراكات الطالب</h3>
+      <form id="studentSubscriptionForm">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <input type="text" id="searchStudentId" placeholder="بحث برقم ID" style="width:140px;">
+          <input type="text" id="searchStudentName" placeholder="بحث بالاسم" style="width:180px;">
+          <button type="button" id="searchStudentBtn" style="width:80px;">بحث</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <select id="subscriptionSubject" style="width:140px;"><option value="">اختر المادة</option></select>
+          <select id="subscriptionTeacher" style="width:140px;"><option value="">اختر الأستاذ</option></select>
+          <select id="subscriptionGroup" style="width:140px;"><option value="">اختر المجموعة</option></select>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <button type="submit" id="addSubscriptionBtn">إضافة</button>
+          <button type="button" onclick="showSubscriptionsModal()" class="btn-secondary" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; white-space: nowrap;">
+            <i class="fa-solid fa-list"></i> عرض الاشتراكات
+          </button>
+        </div>
+      </form>
+      <table id="subscriptionsTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>ID الطالب</th>
+            <th>اسم الطالب</th>
+            <th>المادة</th>
+            <th>الأستاذ</th>
+            <th>المجموعة</th>
+            <th>الأكشن</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- سيتم عرض الاشتراكات هنا -->
+        </tbody>
+      </table>
+    </div>
+    <div class="sub-section" id="payment-management-subsection" style="margin-top:32px;">
+      <h3 style="text-align:right;margin-bottom:12px;">المدفوعات</h3>
+      <form id="studentPaymentsForm">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+          <input type="text" id="searchPaymentId" placeholder="بحث برقم ID" style="width:140px;">
+          <input type="text" id="searchPaymentName" placeholder="بحث بالاسم" style="width:180px;">
+          <button type="button" id="searchPaymentBtn" style="width:100px;">بحث</button>
+          <button type="button" id="showReportsBtn" onclick="showPaymentReports()" style="
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+          ">📊 تقارير الدفع</button>
+        </div>
+      </form>
+      <div id="paymentsTableContainer" style="margin-top:18px;">
+        <table id="paymentsTable" style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>المادة</th>
+              <th>الأستاذ</th>
+              <th>المجموعة</th>
+              <th>المدفوعات</th>
+              <th>الأكشن</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- سيتم عرض المدفوعات هنا -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="attendance-section" style="margin-top:40px;">
+    <h2 style="text-align:center;margin-bottom:24px;">الحضور والمتابعة</h2>
+    <form id="attendanceForm">
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+        <select id="attendanceSubject" style="width:140px;"><option value="">اختر المادة</option></select>
+        <select id="attendanceTeacher" style="width:140px;"><option value="">اختر الأستاذ</option></select>
+        <select id="attendanceGroup" style="width:140px;"><option value="">اختر المجموعة</option></select>
+        <button type="button" id="generateAttendanceTableBtn" style="width:120px;">إنشاء</button>
+      </div>
+    </form>
+    <div id="attendanceSearch" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;width:100%;margin-bottom:12px;">
+      <input type="text" id="searchAttendanceId" placeholder="بحث برقم ID" style="width:140px;">
+      <input type="text" id="searchAttendanceName" placeholder="بحث بالاسم" style="width:180px;">
+      <button type="button" id="searchInTableBtn" style="width:80px;">بحث</button>
+    </div>
+    <div id="attendanceTableContainer" style="margin-top:18px;">
+      <table id="attendanceTable" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>الطالب</th>
+            <th>الحضور</th>
+            <th>حالة الدفع</th>
+            <th>الأكشن</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- سيتم توليد بيانات الطلاب هنا -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- نافذة تصدير التقرير المنبثقة -->
+  <div id="exportModal" class="modal" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+  ">
+    <div class="modal-content" style="
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideInCentered 0.3s ease;
+    ">
+      <!-- رأس النافذة -->
+      <div style="
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 20px 20px 0 0;
+        text-align: center;
+        position: relative;
+      ">
+        <h3 style="margin: 0; font-size: 22px; font-weight: bold;">تصدير تقرير المدفوعات</h3>
+        <button onclick="hideExportModal()" style="
+          position: absolute;
+          top: 15px;
+          left: 20px;
+          background: none;
+          border: none;
+          color: white;
+          font-size: 28px;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        " onmouseover="this.style.transform='rotate(90deg)'" onmouseout="this.style.transform='rotate(0deg)'"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+
+      <!-- محتوى النافذة -->
+      <div style="padding: 30px;">
+        
+        <!-- اختيار نوع الملف -->
+        <div style="margin-bottom: 25px;">
+          <h4 style="color: #333; margin-bottom: 15px; font-size: 18px;">اختر نوع الملف:</h4>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
+            <!-- خيار PDF -->
+            <label class="export-option" style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              padding: 20px;
+              border: 2px solid #e9ecef;
+              border-radius: 12px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              background: #f8f9fa;
+            " onmouseover="this.style.borderColor='#dc3545'; this.style.backgroundColor='#fff5f5'" 
+               onmouseout="this.style.borderColor='#e9ecef'; this.style.backgroundColor='#f8f9fa'">
+              <input type="radio" name="exportType" value="pdf" style="display: none;" onchange="selectExportType(this)">
+              <div style="font-size: 32px; margin-bottom: 8px;"><i class="fa-solid fa-file-pdf" style="color:#dc3545"></i></div>
+              <span style="font-weight: bold; color: #dc3545;">PDF</span>
+              <small style="color: #666; text-align: center;">ملف محمول للطباعة</small>
+            </label>
+
+            <!-- خيار Excel -->
+            <label class="export-option" style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              padding: 20px;
+              border: 2px solid #e9ecef;
+              border-radius: 12px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              background: #f8f9fa;
+            " onmouseover="this.style.borderColor='#198754'; this.style.backgroundColor='#f0fff4'" 
+               onmouseout="this.style.borderColor='#e9ecef'; this.style.backgroundColor='#f8f9fa'">
+              <input type="radio" name="exportType" value="excel" style="display: none;" onchange="selectExportType(this)">
+              <div style="font-size: 32px; margin-bottom: 8px;"><i class="fa-solid fa-file-excel" style="color:#198754"></i></div>
+              <span style="font-weight: bold; color: #198754;">Excel</span>
+              <small style="color: #666; text-align: center;">جداول بيانات متقدمة</small>
+            </label>
+          </div>
+        </div>
+
+        <!-- إعدادات إضافية -->
+        <div style="margin-bottom: 25px;">
+          <h4 style="color: #333; margin-bottom: 15px; font-size: 18px;">إعدادات التصدير:</h4>
+          
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef;">
+            <!-- اسم الملف -->
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">اسم الملف:</label>
+              <input type="text" id="exportFileName" value="تقرير_المدفوعات" style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #dee2e6;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: border-color 0.3s ease;
+              " onfocus="this.style.borderColor='#28a745'" onblur="this.style.borderColor='#dee2e6'">
+            </div>
+
+            <!-- تضمين التاريخ -->
+            <div style="margin-bottom: 15px;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="includeDate" checked style="
+                  width: 18px; 
+                  height: 18px;
+                  accent-color: #28a745;
+                ">
+                <span style="font-weight: bold; color: #555;"> تضمين التاريخ في اسم الملف</span>
+              </label>
+            </div>
+
+            <!-- تضمين الوقت -->
+            <div>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="includeTime" style="
+                  width: 18px; 
+                  height: 18px;
+                  accent-color: #28a745;
+                ">
+                <span style="font-weight: bold; color: #555;"> تضمين الوقت في اسم الملف</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- أزرار العمل -->
+        <div style="display: flex; gap: 15px; justify-content: center;">
+          <button onclick="executeExport()" id="confirmExportBtn" disabled style="
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+          ">
+            بدء التصدير
+          </button>
+          
+          <button onclick="hideExportModal()" style="
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          " onmouseover="this.style.background='linear-gradient(135deg, #c82333 0%, #bd2130 100%)'" onmouseout="this.style.background='linear-gradient(135deg, #dc3545 0%, #c82333 100%)'">
+             إلغاء
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- /.analytics-container -->
+
+  <style>
+    /* منع أي hover أو transform على Header و Footer */
+    .sidebar-header,
+    .sidebar-footer,
+    #systemSettingsSection > .sidebar-header,
+    #systemSettingsSection > .sidebar-footer {
+      transition: none !important;
+      transform: none !important;
+    }
+    
+    .sidebar-header:hover,
+    .sidebar-footer:hover,
+    #systemSettingsSection > .sidebar-header:hover,
+    #systemSettingsSection > .sidebar-footer:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Hover effect for system settings cards only */
+    .settings-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15) !important;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes slideInCentered {
+      from { 
+        transform: translate(-50%, -50%) translateY(-50px) scale(0.95); 
+        opacity: 0; 
+      }
+      to { 
+        transform: translate(-50%, -50%) translateY(0) scale(1); 
+        opacity: 1; 
+      }
+    }
+    
+    .export-option.selected {
+      border-color: #28a745 !important;
+      background-color: #f0fff4 !important;
+      transform: scale(1.05);
+    }
+  </style>
+
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  
+  <!-- مكتبات التصدير البسيطة والموثوقة -->
+  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  
+  <!-- Authentication Check -->
+  <script>
+    // التحقق من تسجيل الدخول مع تحديث الصلاحيات من الخادم
+    async function checkAuthentication() {
+      console.log('🔐 التحقق من المصادقة وتحديث الصلاحيات...');
+      
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userData = localStorage.getItem('user');
+      
+      if (isLoggedIn !== 'true' || !userData) {
+        // المستخدم غير مسجل دخول - توجيه لصفحة تسجيل الدخول
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      try {
+        const user = JSON.parse(userData);
+        console.log('👤 المستخدم المحفوظ محلياً:', user.firstName + ' ' + user.lastName);
+        console.log('🔄 جاري تحديث الصلاحيات من الخادم...');
+        
+        // جلب الصلاحيات المحدثة من الخادم
+        try {
+          const response = await fetch('/api/auth/user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              userId: user._id
+            })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.user) {
+              console.log('✅ تم تحديث بيانات المستخدم من الخادم');
+              console.log('🔄 الصلاحيات القديمة:', Object.keys(user.permissions || {}).filter(key => user.permissions[key]));
+              console.log('🆕 الصلاحيات الجديدة:', Object.keys(data.user.permissions || {}).filter(key => data.user.permissions[key]));
+              
+              // تحديث localStorage بالبيانات الجديدة
+              localStorage.setItem('user', JSON.stringify(data.user));
+              
+              // إضافة اسم المستخدم للـ navbar
+              updateNavbarWithUser(data.user);
+              
+              return true;
+            }
+          }
+          
+          console.warn('⚠️ فشل جلب بيانات المستخدم - استخدام البيانات المحفوظة');
+        } catch (fetchError) {
+          console.warn('⚠️ خطأ في الاتصال بالخادم - استخدام البيانات المحفوظة:', fetchError);
+        }
+        
+        // في حالة فشل جلب البيانات، استخدم البيانات المحفوظة
+        console.log('🔐 الدور:', user.role);
+        console.log('🎯 الصلاحيات المحفوظة:', Object.keys(user.permissions || {}).filter(key => user.permissions[key]));
+        
+        // إضافة اسم المستخدم للـ navbar
+        updateNavbarWithUser(user);
+        
+        return true;
+      } catch (error) {
+        console.error('خطأ في بيانات المستخدم:', error);
+        localStorage.clear();
+        window.location.href = 'login.html';
+        return false;
+      }
+    }
+    
+    // تحديث شريط التنقل بمعلومات المستخدم
+    function updateNavbarWithUser(user) {
+      // إضافة زر الملف الشخصي ومعلومات المستخدم للنافبار
+      const navbar = document.getElementById('mainNavbar');
+      if (navbar) {
+        // إضافة زر الملف الشخصي في الجانب الأيسر
+        const userInfo = document.createElement('div');
+        userInfo.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          color: white;
+        `;
+        
+        userInfo.innerHTML = `
+          <div onclick="showUserProfile()" style="
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          " onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.borderColor='rgba(255,255,255,0.5)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.borderColor='rgba(255,255,255,0.3)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+            <div style="
+              width: 38px; 
+              height: 38px; 
+              background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.15) 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 16px;
+              border: 2px solid rgba(255,255,255,0.4);
+            "><i class="fa-solid fa-user" style="color:white;font-size:16px;"></i></div>
+            <div style="text-align: right; line-height: 1.3;">
+              <div style="font-size: 14px; font-weight: bold;">${user.firstName} ${user.lastName}</div>
+              <div style="font-size: 11px; opacity: 0.85;">${getRoleDisplayName(user.role)}</div>
+            </div>
+          </div>
+        `;
+        
+        // إضافة معلومات المستخدم في النهاية
+        navbar.appendChild(userInfo);
+      }
+      
+      // تحديث معلومات المستخدم في القائمة الجانبية
+      updateSidebarUserInfo(user);
+    }
+    
+    // تحديث معلومات المستخدم في القائمة الجانبية
+    function updateSidebarUserInfo(user) {
+      const userName = document.getElementById('sidebarUserName');
+      const userRole = document.getElementById('sidebarUserRole');
+      
+      if (userName) {
+        userName.textContent = `${user.firstName} ${user.lastName}`;
+      }
+      
+      if (userRole) {
+        userRole.textContent = getRoleDisplayName(user.role);
+      }
+    }
+    
+    // تحويل اسم الدور للعربية
+    function getRoleDisplayName(role) {
+      const roleNames = {
+        'admin': 'مدير النظام',
+        'receptionist': 'موظف استقبال',
+        'follow_up_staff': 'موظف متابعة'
+      };
+      return roleNames[role] || role;
+    }
+    
+    // التحقق من Authentication عند تحميل الصفحة مع تحديث الصلاحيات
+    (async function() {
+      const authResult = await checkAuthentication();
+      if (!authResult) {
+        // إذا فشل التحقق، لا نحمل باقي السكريبت
+        throw new Error('Authentication required');
+      }
+      
+      // تحديث الواجهة الديناميكية بعد تحديث الصلاحيات
+      setTimeout(() => {
+        setupDynamicInterface();
+      }, 100);
+    })();
+
+    // دالة التحكم في إظهار الأقسام حسب الصلاحيات
+    function setupDynamicInterface() {
+      console.log('🔧 إعداد الواجهة الديناميكية حسب الصلاحيات...');
+      
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const permissions = user.permissions || {};
+      
+      console.log('👤 صلاحيات المستخدم:', permissions);
+      
+      // حساب الصلاحيات الذكية
+      const hasAnyAdminPermission = permissions.general_management || permissions.add_subject || permissions.add_teacher || permissions.add_group;
+      const hasAnyReceptionPermission = permissions.reception_registration || permissions.register_student || permissions.manage_subscriptions || permissions.manage_payments;
+      const hasAttendancePermission = permissions.follow_up_attendance;
+      
+      console.log('🧠 الصلاحيات المحسوبة:', {
+        admin: hasAnyAdminPermission,
+        reception: hasAnyReceptionPermission,
+        attendance: hasAttendancePermission
+      });
+      
+      // قواعد إظهار/إخفاء الأقسام والأزرار (محسّنة)
+      const permissionRules = {
+        // أزرار التنقل في الـ Navbar
+        'admin-section-btn': hasAnyAdminPermission, // الإدارة العامة - إذا كان فيه أي صلاحية إدارية
+        'reception-registration-section-btn': hasAnyReceptionPermission, // الاستقبال والتسجيل - إذا كان فيه أي صلاحية استقبال
+        'attendance-section-btn': hasAttendancePermission, // المتابعة والحضور
+        
+        // الأقسام الرئيسية
+        'sidebar-user-management-btn': user.role === 'admin', // زر إدارة المستخدمين في الشريط الجانبي - للأدمن فقط
+        'sidebar-financial-analytics-btn': user.role === 'admin', // زر التحليلات المالية المتقدمة في الشريط الجانبي - للأدمن فقط
+        'sidebar-system-settings-btn': user.role === 'admin', // زر إعدادات النظام في الشريط الجانبي - للأدمن فقط
+        'resources-admin-section': hasAnyAdminPermission, // يظهر إذا كان فيه أي صلاحية فرعية
+        'reception-registration-section': hasAnyReceptionPermission, // يظهر إذا كان فيه أي صلاحية فرعية
+        'attendance-section': hasAttendancePermission,
+        
+        // الأقسام الفرعية للإدارة العامة (تحكم مفصل)
+        'subject-admin-section': permissions.add_subject || false,
+        'teacher-admin-section': permissions.add_teacher || false,
+        'group-admin-section': permissions.add_group || false,
+        
+        // الأقسام الفرعية للاستقبال والتسجيل (تحكم مفصل)
+        'student-registration-subsection': permissions.register_student || false,
+        'student-subscription-subsection': permissions.manage_subscriptions || false,
+        'payment-management-subsection': permissions.manage_payments || false
+      };
+      
+      // تطبيق القواعد
+      for (const [elementId, shouldShow] of Object.entries(permissionRules)) {
+        const element = document.getElementById(elementId);
+        const navButton = document.querySelector(`[onclick="scrollToSection('${elementId}')"]`);
+        
+        if (element) {
+          if (shouldShow) {
+            element.style.display = element.tagName === 'BUTTON' ? 'flex' : 'block';
+            element.style.setProperty('display', element.tagName === 'BUTTON' ? 'flex' : 'block', 'important');
+            console.log(`✅ إظهار عنصر: ${elementId}`);
+          } else {
+            element.style.setProperty('display', 'none', 'important');
+            console.log(`❌ إخفاء عنصر: ${elementId}`);
+          }
+        }
+        
+        // إخفاء/إظهار أزرار التنقل
+        if (navButton) {
+          if (shouldShow) {
+            navButton.style.display = 'inline-flex';
+          } else {
+            navButton.style.display = 'none';
+          }
+        }
+      }
+      
+      console.log('✅ تم إعداد الواجهة الديناميكية بنجاح');
+    }
+
+    // تشغيل الواجهة الديناميكية بعد تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+      // تأخير قصير للتأكد من تحديث البيانات
+      setTimeout(() => {
+        setupDynamicInterface();
+      }, 200);
+    });
+    
+    console.log('🔐 تم التحقق من المصادقة بنجاح');
+  </script>
+  
+  <script src="script.js"></script>
+
+  <!-- Auto-apply analytics classes for consistent look -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      // form fields
+      document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"], select, textarea').forEach(function(el){
+        if (!el.classList.contains('form-input')) el.classList.add('form-input');
+      });
+
+      // tables
+      document.querySelectorAll('table').forEach(function(t){ if (!t.classList.contains('data-table')) t.classList.add('data-table'); });
+
+      // buttons: default secondary, preserve special classes
+      document.querySelectorAll('button').forEach(function(btn){
+        if (btn.classList.contains('btn-primary') || btn.classList.contains('btn-secondary') || btn.classList.contains('login-btn')) return;
+        btn.classList.add('btn-secondary');
+      });
+
+      // make some important buttons primary by id
+      ['showReportsBtn','generateAttendanceTableBtn','exportReportBtn','addStudentPhone','addGuardianPhone','addSubscriptionBtn','searchPaymentBtn','searchStudentBtn'].forEach(function(id){
+        var b = document.getElementById(id); if (b) { b.classList.remove('btn-secondary'); b.classList.add('btn-primary'); }
+      });
+
+      // sidebars and modals
+      ['userProfileSection','systemSettingsSection','paymentReportsSection'].forEach(function(id){
+        var el = document.getElementById(id); if (el && !el.classList.contains('card-like')) el.classList.add('card-like');
+      });
+      // inject icons next to major headings to match analytics style
+      var iconMap = [
+        // exact headings (higher priority)
+  {match:/^\s*الإدارة العامة للموارد\s*$/i, icon:'fa-user-gear', grad:'icon-grad-cyan'},
+  {match:/^\s*إدارة اشتراكات الطالب\s*$/i, icon:'fa-file-invoice', grad:'icon-grad-green'},
+  {match:/^\s*إضافة مادة\s*$/i, icon:'fa-book', grad:'icon-grad-cyan'},
+    {match:/^\s*إضافة مجموعة\s*$/i, icon:'fa-users', grad:'icon-grad-cyan'},
+  {match:/^\s*تسجيل الطالب\s*$/i, icon:'fa-user-plus', grad:'icon-grad-green'},
+  {match:/^\s*الاستقبال والتسجيل\s*$/i, icon:'fa-user-tie', grad:'icon-grad-green'},
+        // broader/fallback matches
+  {match:/التحليلات|التحليلات المالية|التحليلات المالية المتقدمة|Financial/, icon:'fa-wallet', grad:'icon-grad-orange'},
+  {match:/الإدارة|إدارة/, icon:'fa-warehouse', grad:'icon-grad-cyan'},
+        {match:/الحضور|الحضور والمتابعة/, icon:'fa-calendar-check', grad:'icon-grad-blue'}
+      ];
+
+      function insertIconBefore(el, iconClass, gradClass){
+        if (!el) return;
+        if (el.classList.contains('heading-with-icon')) return;
+        var span = document.createElement('span');
+        span.className = 'card-icon small ' + gradClass; // stable static icon
+        span.innerHTML = '<i class="fa-solid ' + iconClass + '" style="font-size:16px;color:rgba(255,255,255,0.95)"></i>';
+        el.classList.add('heading-with-icon');
+        el.insertBefore(span, el.firstChild);
+      }
+
+      // target main section headings
+      document.querySelectorAll('.analytics-container h2, .analytics-container h3, .section h2, .sub-section h3').forEach(function(h){
+        var text = (h.textContent || '').trim();
+        for (var i=0;i<iconMap.length;i++){
+          if (iconMap[i].match.test(text)) { insertIconBefore(h, iconMap[i].icon, iconMap[i].grad); break; }
+        }
+      });
+
+      // style internal parts of resources admin section
+      var resources = document.getElementById('resources-admin-section');
+      if (resources){
+        resources.querySelectorAll('.sub-section').forEach(function(s){ if (!s.classList.contains('card-like')) s.classList.add('card-like'); });
+        resources.querySelectorAll('input, select, textarea').forEach(function(e){ if (!e.classList.contains('form-input')) e.classList.add('form-input'); });
+        resources.querySelectorAll('table').forEach(function(t){ if (!t.classList.contains('data-table')) t.classList.add('data-table'); });
+        resources.querySelectorAll('button').forEach(function(b){ if (!b.classList.contains('btn-primary')) b.classList.add('btn-secondary'); });
+        resources.querySelectorAll('button[type="submit"]').forEach(function(b){ b.classList.remove('btn-secondary'); b.classList.add('btn-primary'); });
+      }
+
+      // style internal parts of reception-registration section
+      var reception = document.getElementById('reception-registration-section');
+      if (reception){
+        reception.querySelectorAll('.sub-section').forEach(function(s){ if (!s.classList.contains('card-like')) s.classList.add('card-like'); });
+        reception.querySelectorAll('input, select, textarea').forEach(function(e){ if (!e.classList.contains('form-input')) e.classList.add('form-input'); });
+        reception.querySelectorAll('table').forEach(function(t){ if (!t.classList.contains('data-table')) t.classList.add('data-table'); });
+        reception.querySelectorAll('button').forEach(function(b){ if (!b.classList.contains('btn-primary')) b.classList.add('btn-secondary'); });
+        reception.querySelectorAll('button[type="submit"]').forEach(function(b){ b.classList.remove('btn-secondary'); b.classList.add('btn-primary'); });
+      }
+
+      // reveal animations
+      setTimeout(function(){ document.querySelectorAll('.analytics-card, .card-like').forEach(function(c){ c.classList.add('show'); }); }, 120);
+    });
+  </script>
+
+  <!-- Apply consistent icons across sidebar and system settings -->
+  <script>
+    (function(){
+      // mapping by element id -> [fa-icon, grad-class, position]
+      var idMap = {
+        'admin-section-btn': ['fa-chart-columns','icon-grad-blue','left'],
+        'reception-registration-section-btn': ['fa-clipboard-list','icon-grad-orange','left'],
+        'attendance-section-btn': ['fa-calendar-check','icon-grad-blue','left'],
+        'sidebar-system-settings-btn': ['fa-gear','icon-grad-cyan','left']
+      };
+
+      function applyToIdMap(){
+        Object.keys(idMap).forEach(function(id){
+          var el = document.getElementById(id);
+          if (!el) return;
+          var info = idMap[id];
+          injectIcon(el, info[0], info[1], info[2]);
+        });
+      }
+
+      // mapping by onclick function name -> [fa-icon, grad]
+      var onclickMap = {
+        'autoDetectTimezone': ['fa-globe','icon-grad-cyan'],
+        'reloadSystemSettings': ['fa-sync','icon-grad-blue']
+      };
+
+      function applyOnclickMap(){
+        document.querySelectorAll('button[onclick]').forEach(function(b){
+          var onclick = b.getAttribute('onclick') || '';
+          // extract function name
+          var m = onclick.match(/^\s*([a-zA-Z0-9_]+)\s*\(/);
+          if (!m) return;
+          var name = m[1];
+          if (onclickMap[name]) injectIcon(b, onclickMap[name][0], onclickMap[name][1], 'left');
+        });
+      }
+
+      // generic injector: prepend or append icon span while preserving label text
+      function injectIcon(el, faIcon, gradClass, position){
+        try {
+          position = position || 'left';
+          var text = el.dataset.rawText || el.innerText || el.textContent || '';
+          // store original if not already
+          if (!el.dataset.rawText) el.dataset.rawText = text.trim();
+          var span = document.createElement('span');
+          span.className = 'card-icon small ' + gradClass;
+          span.innerHTML = '<i class="fa-solid ' + faIcon + '" style="color:rgba(255,255,255,0.95)"></i>';
+          // avoid double-inject
+          if (el.querySelector('.card-icon')) return;
+          if (position === 'left'){
+            el.insertBefore(span, el.firstChild);
+            el.style.display = 'inline-flex';
+            el.style.alignItems = 'center';
+            el.style.gap = '8px';
+          } else {
+            el.appendChild(span);
+          }
+        } catch (e) { console.warn('injectIcon failed', e); }
+      }
+
+      // apply to sidebar static items (by text keywords)
+      function applyKeywordMapping(){
+        var keywordMap = [
+          {k:/إدارة المستخدمين|إدارة المستخدمين|المستخدمين/, icon:'fa-users-gear', grad:'icon-grad-cyan'},
+          {k:/الاستقبال/, icon:'fa-user-tie', grad:'icon-grad-green'},
+          {k:/اشتراكات|إدارة الاشتراكات|إدارة اشتراكات/, icon:'fa-file-invoice', grad:'icon-grad-green'},
+          {k:/التحليلات المالية|التحليلات/, icon:'fa-wallet', grad:'icon-grad-orange'},
+          {k:/إعدادات النظام|⚙️ إعدادات النظام|إعدادات/, icon:'fa-gear', grad:'icon-grad-cyan'}
+        ];
+
+        document.querySelectorAll('#userProfileSection button, .section h2, .sub-section h3, #systemSettingsSection h4').forEach(function(el){
+          var txt = (el.innerText || el.textContent || '').trim();
+          for (var i=0;i<keywordMap.length;i++){
+            if (keywordMap[i].k.test(txt)) { injectIcon(el, keywordMap[i].icon, keywordMap[i].grad, 'left'); break; }
+          }
+        });
+      }
+
+      // run all
+      setTimeout(function(){ applyToIdMap(); applyOnclickMap(); applyKeywordMapping(); }, 200);
+    })();
+  </script>
+
+  <!-- 📊 Lightbox التقارير -->
+  <div id="paymentReportsOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  " onclick="hidePaymentReports()"></div>
+
+  <div id="paymentReportsSection" style="
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 1200px;
+    height: 90%;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 2001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideInCentered 0.3s ease-out;
+  ">
+    <!-- رأس النافذة -->
+    <div style="
+      background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    ">
+      <h3 style="margin: 0; font-size: 20px;">تقارير المدفوعات</h3>
+      <button onclick="hidePaymentReports()" style="
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px;
+      ">✕</button>
+    </div>
+
+    <!-- محتوى النافذة -->
+    <div style="
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    ">
+      <!-- نموذج الفلترة -->
+      <div style="
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        border: 2px solid #17a2b8;
+      ">
+        <h4 style="color: #17a2b8; margin-bottom: 20px; text-align: center;">فلترة التقرير</h4>
+        
+        <div style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+          margin-bottom: 20px;
+        ">
+          <!-- قائمة المستوى -->
+          <div>
+            <label style="display: block; margin-bottom: 8px; color: #495057; font-weight: bold;">المستوى:</label>
+            <select id="reportLevel" style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #dee2e6;
+              border-radius: 8px;
+              font-size: 14px;
+              background: white;
+            " onchange="">
+              <option value="">اختر المستوى</option>
+              <option value="ابتدائى">ابتدائى</option>
+              <option value="اعدادى">اعدادى</option>
+              <option value="ثانوى">ثانوى</option>
+            </select>
+          </div>
+
+          <!-- قائمة الصف -->
+          <div>
+            <label style="display: block; margin-bottom: 8px; color: #495057; font-weight: bold;">الصف:</label>
+            <select id="reportClass" style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #dee2e6;
+              border-radius: 8px;
+              font-size: 14px;
+              background: white;
+            " onchange="">
+              <option value="">اختر الصف</option>
+              <option value="الأول">الأول</option>
+              <option value="الثانى">الثانى</option>
+              <option value="الثالث">الثالث</option>
+              <option value="الرابع">الرابع</option>
+              <option value="الخامس">الخامس</option>
+              <option value="السادس">السادس</option>
+            </select>
+          </div>
+
+          <!-- قائمة المادة -->
+          <div>
+            <label style="display: block; margin-bottom: 8px; color: #495057; font-weight: bold;">المادة:</label>
+            <select id="reportSubject" style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #dee2e6;
+              border-radius: 8px;
+              font-size: 14px;
+              background: white;
+            " onchange="">
+              <option value="">اختر المادة</option>
+            </select>
+          </div>
+
+          <!-- قائمة الأستاذ -->
+          <div>
+            <label style="display: block; margin-bottom: 8px; color: #495057; font-weight: bold;">الأستاذ:</label>
+            <select id="reportTeacher" style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #dee2e6;
+              border-radius: 8px;
+              font-size: 14px;
+              background: white;
+            " onchange="">
+              <option value="">اختر الأستاذ</option>
+            </select>
+          </div>
+
+          <!-- قائمة المجموعة -->
+          <div>
+            <label style="display: block; margin-bottom: 8px; color: #495057; font-weight: bold;">المجموعة:</label>
+            <select id="reportGroup" style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #dee2e6;
+              border-radius: 8px;
+              font-size: 14px;
+              background: white;
+            ">
+              <option value="">اختر المجموعة</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- زر الرصد -->
+        <div style="text-align: center;">
+          <button onclick="generatePaymentReport()" style="
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+          ">🔍 رصد التقرير</button>
+        </div>
+      </div>
+
+      <!-- جدول التقرير -->
+      <div id="paymentReportTableContainer" style="
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #dee2e6;
+        overflow: hidden;
+        display: none;
+      ">
+        <div style="
+          background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+          color: white;
+          padding: 15px;
+          text-align: center;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        ">
+          <h4 style="margin: 0;">نتائج التقرير</h4>
+          
+          <!-- زر التصدير -->
+          <button id="exportReportBtn" onclick="showExportModal()" style="
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+          " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(40, 167, 69, 0.4)'" 
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(40, 167, 69, 0.3)'">
+            📊 تصدير التقرير
+          </button>
+        </div>
+        
+        
+        <div class="payment-reports-scroll-container" id="paymentReportsScrollContainer" style="
+          overflow-x: auto; 
+          border: 2px solid #17a2b8;
+          border-radius: 8px;
+          background-color: white;
+        ">
+          <table id="paymentReportTable" style="
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin: 0;
+          ">
+            <thead style="
+              background: #17a2b8;
+              color: white;
+              position: sticky;
+              top: 0;
+              z-index: 10;
+            ">
+              <tr>
+                <th style="padding: 15px; border: 1px solid #fff; text-align: center; font-weight: bold;">ID الطالب</th>
+                <th style="padding: 15px; border: 1px solid #fff; text-align: center; font-weight: bold;">اسم الطالب</th>
+                <th style="padding: 15px; border: 1px solid #fff; text-align: center; font-weight: bold;">التفاصيل</th>
+                <th style="padding: 15px; border: 1px solid #fff; text-align: center; font-weight: bold;">المدفوعات</th>
+                <th style="padding: 15px; border: 1px solid #fff; text-align: center; font-weight: bold;">رقم الطالب</th>
+                <th style="padding: 15px; border: 1px solid #fff; text-align: center; font-weight: bold;">رقم ولي الأمر</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- سيتم إدراج بيانات التقرير هنا -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      // add spacing class to buttons that include injected icons
+      document.querySelectorAll('button').forEach(function(b){
+        try {
+          if (b.querySelector('.card-icon') || b.querySelector('.colored-icon') || b.querySelector('i.fa')){
+            b.classList.add('btn-with-icon');
+            b.style.alignItems = 'center';
+          }
+
+          // replace single-character close markers with FA xmark
+          var txt = (b.textContent || '').trim();
+          if (txt === '✕' || txt === '✖' || txt === '×'){
+            b.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+            b.classList.add('btn-with-icon');
+          } else {
+            // strip common emoji ranges from pure text nodes to avoid duplication
+            var cleaned = txt.replace(/([\u{1F300}-\u{1F6FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F1E6}-\u{1F1FF}])/gu,'').trim();
+            if (cleaned !== txt){
+              // keep any existing icon elements and rebuild label
+              var icon = b.querySelector('.card-icon, .colored-icon, i.fa');
+              var iconHtml = icon ? icon.outerHTML + ' ' : '';
+              b.innerHTML = iconHtml + cleaned;
+            }
+          }
+        } catch(e) { /* ignore individual button errors */ }
+      });
+
+      // replace close characters in anchors or other controls
+      document.querySelectorAll('a, button').forEach(function(el){
+        if ((el.textContent || '').trim() === '✕') el.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+      });
+
+      // ensure headings with icons align nicely
+      document.querySelectorAll('.heading-with-icon').forEach(function(h){ h.style.alignItems = 'center'; });
+    });
+  </script>
+
+  <!-- Modal عرض المواد -->
+  <div id="subjectsModal" class="table-modal" style="display: none;">
+    <div class="modal-overlay" onclick="hideTableModal('subjectsModal')"></div>
+    <div class="modal-content-table">
+      <div class="modal-header-table">
+        <h3><i class="fa-solid fa-book"></i> قائمة المواد</h3>
+        <button onclick="hideTableModal('subjectsModal')" class="close-modal-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body-table">
+        <div id="subjectsTableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal عرض الأساتذة -->
+  <div id="teachersModal" class="table-modal" style="display: none;">
+    <div class="modal-overlay" onclick="hideTableModal('teachersModal')"></div>
+    <div class="modal-content-table">
+      <div class="modal-header-table">
+        <h3><i class="fa-solid fa-chalkboard-user"></i> قائمة الأساتذة</h3>
+        <button onclick="hideTableModal('teachersModal')" class="close-modal-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body-table">
+        <div id="teachersTableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal عرض المجموعات -->
+  <div id="groupsModal" class="table-modal" style="display: none;">
+    <div class="modal-overlay" onclick="hideTableModal('groupsModal')"></div>
+    <div class="modal-content-table">
+      <div class="modal-header-table">
+        <h3><i class="fa-solid fa-users"></i> قائمة المجموعات</h3>
+        <button onclick="hideTableModal('groupsModal')" class="close-modal-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body-table">
+        <div id="groupsTableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal عرض الطلاب -->
+  <div id="studentsModal" class="table-modal" style="display: none;">
+    <div class="modal-overlay" onclick="hideTableModal('studentsModal')"></div>
+    <div class="modal-content-table">
+      <div class="modal-header-table">
+        <h3><i class="fa-solid fa-user-graduate"></i> قائمة الطلاب</h3>
+        <button onclick="hideTableModal('studentsModal')" class="close-modal-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body-table">
+        <div id="studentsTableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal عرض الاشتراكات -->
+  <div id="subscriptionsModal" class="table-modal" style="display: none;">
+    <div class="modal-overlay" onclick="hideTableModal('subscriptionsModal')"></div>
+    <div class="modal-content-table">
+      <div class="modal-header-table">
+        <h3><i class="fa-solid fa-clipboard-check"></i> قائمة الاشتراكات</h3>
+        <button onclick="hideTableModal('subscriptionsModal')" class="close-modal-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body-table">
+        <div id="subscriptionsTableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

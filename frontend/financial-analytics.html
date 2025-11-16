@@ -1,0 +1,2998 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحليلات المالية المتقدمة</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.0/index.min.js"></script>
+    <style>
+        .analytics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .analytics-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .analytics-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .analytics-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .analytics-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .analytics-tab {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .analytics-tab.active {
+            color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .analytics-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .icon-revenue { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .icon-collection { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .icon-growth { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .icon-budget { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .change-positive {
+            color: #38a169;
+        }
+
+        .change-negative {
+            color: #e53e3e;
+        }
+
+        .change-neutral {
+            color: #718096;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Separator between stacked analytics cards (e.g. subscriptions vs profit summary) */
+        #transactions-tab .analytics-card + .analytics-card {
+            margin-top: 1.25rem;
+            border-top: 1px solid #edf2f7;
+            padding-top: 1.25rem;
+        }
+
+        /* Make calculate profit and create invoice buttons identical size */
+        #calculate-profit-btn, #create-invoice-btn {
+            min-width: 170px;
+            padding: 0.75rem 1.25rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .data-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-warning {
+            background: #fefcbf;
+            color: #744210;
+            border: 1px solid #f6e05e;
+        }
+
+        .alert-danger {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-draft {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .status-completed {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics-tabs {
+                flex-direction: column;
+            }
+            
+            .actions-bar {
+                flex-direction: column;
+            }
+        }
+
+        /* 📋 تصميم التقارير المالية */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .report-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .report-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .report-info h4.report-title {
+            margin: 0 0 8px 0;
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .report-date {
+            margin: 0 0 8px 0;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .report-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .report-status.finalized {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .report-status.draft {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .report-status.pending {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .report-summary {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .summary-value.revenue {
+            color: #38a169;
+        }
+
+        .summary-value.rate.good {
+            color: #38a169;
+        }
+
+        .summary-value.rate.average {
+            color: #d69e2e;
+        }
+
+        .summary-value.rate.poor {
+            color: #e53e3e;
+        }
+
+        .summary-value.profit {
+            color: #3182ce;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .action-btn.btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* 📋 مودال التقرير */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content.report-modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #718096;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .detail-section {
+            margin-bottom: 30px;
+        }
+
+        .detail-section h4 {
+            margin: 0 0 20px 0;
+            color: #2d3748;
+            font-size: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .card-value.collected {
+            color: #38a169;
+        }
+
+        .card-value.rate {
+            color: #3182ce;
+        }
+
+        .card-value.profit {
+            color: #805ad5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .top-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .group-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .group-rank {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 16px;
+        }
+
+        .group-info {
+            flex: 1;
+            margin-right: 16px;
+        }
+
+        .group-name {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .group-stats {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .group-revenue {
+            font-weight: bold;
+            color: #38a169;
+            font-size: 16px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* 📊 تصميم نسبة التحصيل */
+        .collection-tracking-details {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .collection-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+
+        .collection-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .collection-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .collection-icon {
+            font-size: 18px;
+            margin-left: 12px;
+            opacity: 0.8;
+        }
+
+        .collection-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collection-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 13px;
+        }
+
+        .collection-value {
+            font-weight: bold;
+            font-size: 14px;
+            color: #212529;
+        }
+
+        .collection-value.total-due {
+            color: #6c757d;
+        }
+
+        .collection-value.collected {
+            color: #28a745;
+        }
+
+        .collection-value.remaining {
+            color: #dc3545;
+        }
+
+        /* 📈 تصميم معدل النمو السنوي */
+        .growth-comparison-table {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .comparison-title {
+            margin: 0 0 15px 0;
+            color: #495057;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+
+        .years-comparison {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .year-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+
+        .year-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .year-item.current-year {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+        }
+
+        .year-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .year-label {
+            font-weight: bold;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .growth-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .growth-badge.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .growth-badge.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .growth-badge.neutral {
+            background: #e2e3e5;
+            color: #495057;
+        }
+
+        .year-revenue {
+            font-weight: bold;
+            color: #212529;
+            font-size: 13px;
+        }
+
+        .growth-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .summary-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 13px;
+        }
+
+        .summary-value {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .summary-value.positive {
+            color: #28a745;
+        }
+
+        .summary-value.negative {
+            color: #dc3545;
+        }
+
+        /* 📊 تصميم التتبع اليومي المبسط */
+        .daily-tracking-simple {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tracking-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .tracking-item-simple {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tracking-item-simple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .tracking-icon {
+            font-size: 24px;
+            margin-left: 15px;
+            opacity: 0.8;
+        }
+
+        .tracking-content {
+            flex: 1;
+        }
+
+        .tracking-label-simple {
+            display: block;
+            font-weight: 500;
+            color: #495057;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .tracking-value-simple {
+            display: block;
+            font-weight: bold;
+            font-size: 20px;
+            color: #212529;
+        }
+
+        .daily-amount {
+            color: #007bff;
+        }
+
+        .cumulative-actual {
+            color: #28a745;
+        }
+
+        /* 👨‍🏫 نظام اشتراكات المدرسين */
+        .teachers-subscriptions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .teacher-subscription-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .teacher-subscription-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .teacher-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .teacher-info h4 {
+            margin: 0 0 4px 0;
+            color: #2d3748;
+            font-size: 18px;
+        }
+
+        .teacher-info p {
+            margin: 0;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .subscription-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-inactive {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .teacher-groups {
+            margin-bottom: 16px;
+        }
+
+        .groups-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .group-item {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .group-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .group-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .revenue-breakdown {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .revenue-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .revenue-item {
+            text-align: center;
+        }
+
+        .revenue-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .revenue-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .revenue-value.total {
+            color: #2d3748;
+        }
+
+        .revenue-value.center {
+            color: #3182ce;
+        }
+
+        .revenue-value.teacher {
+            color: #38a169;
+        }
+
+        .teacher-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        /* إعدادات مودال الاشتراك */
+        .subscription-type-section {
+            margin: 20px 0;
+        }
+
+        .subscription-types {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            margin-left: 8px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-custom {
+            border-color: #667eea;
+            background: #667eea;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-custom::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .percentage-section {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .percentage-section h4 {
+            margin: 0 0 16px 0;
+            color: #2d3748;
+            font-size: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .percentage-preview {
+            background: white;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .preview-calculation {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        /* ملخص توزيع الأرباح */
+        .revenue-distribution-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .summary-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .summary-icon.total {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .summary-icon.center {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .summary-icon.teachers {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .summary-title {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .summary-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .summary-percentage {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* تحسين للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .teacher-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .revenue-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .subscription-types {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .teacher-actions {
+                flex-direction: column;
+            }
+
+            .groups-list {
+                grid-template-columns: 1fr;
+            }
+
+            .revenue-distribution-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* تحسين للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .report-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .report-summary {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .summary-item {
+                align-items: center;
+                text-align: center;
+            }
+            
+            .report-actions {
+                justify-content: center;
+            }
+
+            .modal-content.report-modal {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .modal-header, .modal-body, .modal-footer {
+                padding: 20px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .years-comparison {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .year-item {
+                padding: 10px;
+            }
+        }
+
+        /* 🧑‍🏫 تصميم نافذة اشتراك المدرس */
+        .subscription-type-section {
+            margin: 20px 0;
+        }
+
+        .subscription-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            min-height: 70px;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            margin-left: 8px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-custom {
+            border-color: #667eea;
+            background: #667eea;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .percentage-section {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #e6f0ff;
+        }
+
+        .percentage-section h4 {
+            color: #667eea;
+            margin: 0 0 16px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 20px;
+            align-items: end;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .form-row .form-input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* تحسين تصميم النماذج */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input[readonly] {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* تحسين الأزرار */
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a4190);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        /* تحسين النافذة المنبثقة للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+                padding: 16px;
+                max-height: 85vh;
+            }
+
+            .subscription-types {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .radio-option {
+                min-height: 60px;
+                padding: 12px 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* 💰 تصميم نافذة حساب الأرباح */
+        .teacher-info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .teacher-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .teacher-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .teacher-details h4 {
+            margin: 0 0 4px 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .teacher-details p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .subscription-badge {
+            margin-right: auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .calculation-breakdown {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .calculation-breakdown h5 {
+            margin: 0 0 16px 0;
+            color: #2d3748;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calculation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .calc-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .calc-label {
+            display: block;
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .calc-value {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .revenue-distribution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .distribution-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .distribution-item.teacher {
+            border-color: #38a169;
+        }
+
+        .distribution-item.center {
+            border-color: #3182ce;
+        }
+
+        .distribution-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 18px;
+            color: white;
+        }
+
+        .distribution-item.teacher .distribution-icon {
+            background: #38a169;
+        }
+
+        .distribution-item.center .distribution-icon {
+            background: #3182ce;
+        }
+
+        .distribution-info {
+            margin-bottom: 8px;
+        }
+
+        .distribution-label {
+            display: block;
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .distribution-percentage {
+            display: block;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .distribution-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .groups-breakdown {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .groups-breakdown h5 {
+            margin: 0 0 16px 0;
+            color: #2d3748;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-detail-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .group-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .group-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .group-revenue {
+            font-weight: 700;
+            color: #38a169;
+        }
+
+        .group-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* تحسين للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .revenue-distribution {
+                grid-template-columns: 1fr;
+            }
+
+            .calculation-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .teacher-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .growth-summary {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .tracking-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .tracking-item-simple {
+                padding: 12px;
+            }
+            
+            .tracking-value-simple {
+                font-size: 18px;
+            }
+            
+            .tracking-icon {
+                font-size: 20px;
+                margin-left: 10px;
+            }
+
+            .collection-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .collection-value {
+                font-size: 13px;
+            }
+        }
+
+        /* 💰 تصميم نظام إدارة الميزانية */
+        .budget-month-selector, .budget-month-filter {
+            margin-right: auto;
+        }
+
+        .budget-month-selector select, .budget-month-filter select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .fixed-expense-card {
+            background: #f8f9ff;
+            border: 1px solid #e6f0ff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .fixed-expense-card h5 {
+            margin: 0 0 12px 0;
+            color: #667eea;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .expense-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .expense-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .expense-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 16px;
+        }
+
+        .expense-amount {
+            font-weight: 700;
+            color: #e53e3e;
+            font-size: 16px;
+        }
+
+        .expense-category {
+            display: inline-block;
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .expense-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .expense-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .expense-type-fixed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .expense-type-variable {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .expense-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .expense-actions button {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .btn-delete {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .btn-edit:hover {
+            background: #90cdf4;
+        }
+
+        .btn-delete:hover {
+            background: #feb2b2;
+        }
+
+        .budget-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .budget-summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #f7fafc;
+            transition: all 0.3s ease;
+        }
+
+        .budget-summary-item.revenue {
+            border-color: #38a169;
+        }
+
+        .budget-summary-item.expenses {
+            border-color: #e53e3e;
+        }
+
+        .budget-summary-item.profit {
+            border-color: #3182ce;
+        }
+
+        .budget-summary-item.loss-percentage {
+            border-color: #ed8936;
+        }
+
+        .budget-summary-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .budget-summary-item.revenue .budget-summary-icon {
+            background: #38a169;
+        }
+
+        .budget-summary-item.expenses .budget-summary-icon {
+            background: #e53e3e;
+        }
+
+        .budget-summary-item.profit .budget-summary-icon {
+            background: #3182ce;
+        }
+
+        .budget-summary-item.loss-percentage .budget-summary-icon {
+            background: #ed8936;
+        }
+
+        .budget-summary-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .budget-summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .expense-report-chart {
+            margin-top: 20px;
+        }
+
+        .expense-categories-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .category-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .category-name {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+
+        .category-amount {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* تراكر الميزانية المباشر */
+        .live-tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .tracker-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .tracker-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .tracker-card.revenue {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .tracker-card.expenses {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .tracker-card.profit {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .tracker-card.net-profit {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .tracker-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tracker-label {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .tracker-change {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .tracker-trend {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* 📈 تصميم بطاقة التقارير الشهرية والسنوية */
+        .monthly-yearly-reports {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .report-chart-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .report-chart-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .report-chart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .report-chart-btn.active {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #2c3e50;
+        }
+
+        .report-chart-wrapper {
+            position: relative;
+            height: 280px;
+            margin-bottom: 16px;
+        }
+
+        .report-chart-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .report-insights {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e6f0ff;
+        }
+
+        .insight-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .insight-content {
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .insight-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        #financialReportsChart {
+            width: 100% !important;
+            height: 280px !important;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* تحسين للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .budget-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .expense-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .expense-categories-breakdown {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="analytics-container">
+        <!-- header and quick-action buttons removed as requested -->
+
+        <!-- تبويبات التحليلات -->
+        <div class="analytics-tabs">
+            <button class="analytics-tab active" onclick="switchTab('dashboard')">
+                <i class="fas fa-tachometer-alt"></i> لوحة المؤشرات
+            </button>
+            <button class="analytics-tab" onclick="switchTab('reports')">
+                <i class="fas fa-chart-pie"></i> التقارير المالية
+            </button>
+            <button class="analytics-tab" onclick="switchTab('budget')">
+                <i class="fas fa-calculator"></i> إدارة الميزانية
+            </button>
+            <button class="analytics-tab" onclick="switchTab('transactions')">
+                <i class="fas fa-exchange-alt"></i> المعاملات المالية
+            </button>
+        </div>
+
+        <!-- محتوى التبويبات -->
+        
+        <!-- تبويب لوحة المؤشرات -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="analytics-grid">
+                <!-- بطاقة التتبع اليومي للإيرادات -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon icon-revenue">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            التتبع اليومي للإيرادات
+                        </div>
+                    </div>
+                    <div class="metric-value" id="monthly-revenue">0 جنيه</div>
+                    <div class="metric-label">إجمالي الإيرادات المحصلة حتى اليوم</div>
+                    <div class="chart-container">
+                        <canvas id="revenue-trend-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- بطاقة التقارير الشهرية والسنوية -->
+                <div class="analytics-card monthly-yearly-reports">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            التقارير المالية الشهرية والسنوية
+                        </div>
+                    </div>
+                    <div class="report-chart-controls">
+                        <button class="report-chart-btn active" onclick="switchFinancialChart('monthly')">
+                            <i class="fas fa-calendar-alt"></i> شهري
+                        </button>
+                        <button class="report-chart-btn" onclick="switchFinancialChart('yearly')">
+                            <i class="fas fa-calendar"></i> سنوي
+                        </button>
+                        <!-- Comparison button removed as requested -->
+                    </div>
+                    <div class="report-chart-wrapper">
+                        <canvas id="financialReportsChart"></canvas>
+                        <div id="reportChartLoading" class="report-chart-loading">
+                            <div style="width: 16px; height: 16px; border: 2px solid #e6f0ff; border-top: 2px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            جاري تحميل البيانات المالية...
+                        </div>
+                    </div>
+                    <!-- التحليلات والتوصيات محذوفة طبقاً للطلب -->
+                </div>
+            </div>
+
+            <!-- الصف الثاني: نسبة التحصيل ومعدل النمو -->
+            <div class="analytics-grid">
+                <!-- بطاقة نسبة التحصيل -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon icon-collection">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            نسبة التحصيل
+                        </div>
+                    </div>
+                    <div class="metric-value" id="collection-rate">0%</div>
+                    <div class="metric-label">معدل تحصيل المدفوعات</div>
+                    <div id="collection-rate-info"></div>
+                    <div class="chart-container">
+                        <canvas id="collection-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- بطاقة النمو -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon icon-growth">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            معدل النمو
+                        </div>
+                    </div>
+                    <div class="metric-value" id="growth-rate">0%</div>
+                    <div class="metric-label">نمو الإيرادات السنوي</div>
+                    <div id="growth-rate-info"></div>
+                    <div class="chart-container">
+                        <canvas id="growth-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- بطاقة حالة الميزانية (صافي الربح) - جديد: متصلة بالأرشيف (الشهر الحالي) -->
+                <div class="analytics-card" id="budget-netprofit-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon icon-budget">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                حالة الميزانية
+                            </div>
+                            
+                        </div>
+                    <div class="metric-value" id="budget-netprofit-value">—</div>
+                    <div class="metric-label">صافي الربح (الشهر الحالي)</div>
+                    <!-- صندوق معلومات صغير مشابه لبطاقة نسبة التحصيل: الربح، المصروفات، صافى الربح -->
+                    <div id="budget-netprofit-info" class="collection-tracking-details" style="margin-top:8px; font-size:0.95rem; color:#718096;padding:10px;">
+                        <div class="collection-item">
+                            <span class="collection-icon">💹</span>
+                            <div class="collection-content">
+                                <span class="collection-label">الربح</span>
+                                <span class="collection-value" id="budget-netprofit-revenue">—</span>
+                            </div>
+                        </div>
+                        <div class="collection-item">
+                            <span class="collection-icon">🧾</span>
+                            <div class="collection-content">
+                                <span class="collection-label">المصروفات</span>
+                                <span class="collection-value" id="budget-netprofit-expenses">—</span>
+                            </div>
+                        </div>
+                        <div class="collection-item">
+                            <span class="collection-icon">💰</span>
+                            <div class="collection-content">
+                                <span class="collection-label">صافى الربح</span>
+                                <span class="collection-value" id="budget-netprofit-net">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="margin-top:12px;">
+                        <canvas id="budget-netprofit-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول المجموعات الأكثر ربحية -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-crown"></i> المجموعات الأكثر ربحية
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>المجموعة</th>
+                            <th>عدد الطلاب</th>
+                            <th>الإيراد المتوقع</th>
+                            <th>الإيراد المحصل</th>
+                            <th>نسبة التحصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-groups-table">
+                        <!-- سيتم ملء البيانات بـ JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تبويب التقارير المالية -->
+        <div id="reports-tab" class="tab-content">
+            <!-- شريط التحكم العلوي -->
+            <div class="analytics-card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i> نظام التقارير المالية المتقدم
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="action-btn btn-secondary" onclick="reportsSystem.refreshSummary()">
+                            <i class="fas fa-sync"></i> تحديث
+                        </button>
+                        <button class="action-btn btn-success" onclick="reportsSystem.showExportDialog()">
+                            <i class="fas fa-download"></i> تصدير
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- إحصائيات سريعة -->
+                <div id="reports-quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <!-- سيتم ملؤها بـ JavaScript -->
+                </div>
+            </div>
+
+            <div class="analytics-grid" style="grid-template-columns: 350px 1fr;">
+                <!-- القائمة الجانبية: اختيار التقرير -->
+                <div class="analytics-card" style="max-height: 800px; overflow-y: auto;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-folder-tree"></i> اختر تقرير
+                        </div>
+                    </div>
+                    
+                    <!-- نوع التقرير -->
+                    <div style="padding: 0 1.25rem 1rem;">
+                        <label class="form-label">نوع التقرير</label>
+                        <select class="form-input" id="report-type-selector" onchange="reportsSystem.handleTypeChange()">
+                            <option value="monthly">تقرير شهري</option>
+                            <option value="yearly">تقرير سنوي</option>
+                            <option value="comparison">مقارنة بين فترتين</option>
+                            <option value="invoices">فواتير مفصلة</option>
+                        </select>
+                    </div>
+
+                    <!-- خيارات التقرير الشهري -->
+                    <div id="monthly-report-options" class="report-options">
+                        <div style="padding: 0 1.25rem;">
+                            <label class="form-label">اختر السنة</label>
+                            <select class="form-input" id="monthly-year-selector" onchange="reportsSystem.loadMonthsForYear()">
+                                <option value="">-- اختر السنة --</option>
+                            </select>
+                        </div>
+                        <div style="padding: 1rem 1.25rem;">
+                            <label class="form-label">اختر الشهر</label>
+                            <div id="months-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                                <!-- سيتم ملؤها بـ JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- خيارات التقرير السنوي -->
+                    <div id="yearly-report-options" class="report-options" style="display: none;">
+                        <div style="padding: 0 1.25rem;">
+                            <label class="form-label">اختر السنة</label>
+                            <select class="form-input" id="yearly-year-selector">
+                                <option value="">-- اختر السنة --</option>
+                            </select>
+                        </div>
+                        <div style="padding: 1rem 1.25rem;">
+                            <button class="action-btn btn-primary" style="width: 100%;" onclick="reportsSystem.loadYearReport()">
+                                <i class="fas fa-file-chart-line"></i> عرض التقرير السنوي
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- خيارات المقارنة -->
+                    <div id="comparison-report-options" class="report-options" style="display: none;">
+                        <div style="padding: 0 1.25rem;">
+                            <label class="form-label">الفترة الأولى</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                                <select class="form-input" id="comp-year1-selector">
+                                    <option value="">السنة</option>
+                                </select>
+                                <select class="form-input" id="comp-month1-selector">
+                                    <option value="">الشهر</option>
+                                </select>
+                            </div>
+                            
+                            <label class="form-label">الفترة الثانية</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <select class="form-input" id="comp-year2-selector">
+                                    <option value="">السنة</option>
+                                </select>
+                                <select class="form-input" id="comp-month2-selector">
+                                    <option value="">الشهر</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="padding: 1rem 1.25rem;">
+                            <button class="action-btn btn-primary" style="width: 100%;" onclick="reportsSystem.loadComparisonReport()">
+                                <i class="fas fa-balance-scale"></i> عرض المقارنة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- خيارات الفواتير -->
+                    <div id="invoices-report-options" class="report-options" style="display: none;">
+                        <div style="padding: 0 1.25rem;">
+                            <label class="form-label">السنة</label>
+                            <select class="form-input" id="invoice-year-selector" onchange="reportsSystem.loadInvoicesForMonth()">
+                                <option value="">-- اختر السنة --</option>
+                            </select>
+                            
+                            <label class="form-label" style="margin-top: 1rem;">الشهر</label>
+                            <select class="form-input" id="invoice-month-selector" onchange="reportsSystem.loadInvoicesForMonth()">
+                                <option value="">-- اختر الشهر --</option>
+                            </select>
+                        </div>
+                        <div style="padding: 1rem 1.25rem;">
+                            <button class="action-btn btn-primary" style="width: 100%;" onclick="reportsSystem.showAllInvoices()">
+                                <i class="fas fa-receipt"></i> عرض جميع الفواتير
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- منطقة عرض التقرير -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-file-contract"></i> <span id="report-title">عرض التقرير</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="action-btn btn-secondary" onclick="reportsSystem.printCurrentReport()" id="print-report-btn" style="display: none;">
+                                <i class="fas fa-print"></i> طباعة
+                            </button>
+                            <button class="action-btn btn-success" onclick="reportsSystem.exportCurrentReport()" id="export-report-btn" style="display: none;">
+                                <i class="fas fa-file-export"></i> تصدير
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="report-display-area" style="padding: 1.5rem; min-height: 600px;">
+                        <div style="text-align: center; padding: 4rem 2rem; color: #a0aec0;">
+                            <i class="fas fa-chart-pie" style="font-size: 4rem; margin-bottom: 1.5rem; opacity: 0.3;"></i>
+                            <h3 style="margin: 0 0 0.5rem; color: #718096;">اختر تقريراً للعرض</h3>
+                            <p style="margin: 0; font-size: 0.95rem;">استخدم القائمة الجانبية لاختيار نوع التقرير والفترة الزمنية</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب إدارة الميزانية -->
+        <div id="budget-tab" class="tab-content">
+            <div class="analytics-grid">
+                <!-- تراكر الميزانية الشهرية المباشر -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-tachometer-alt"></i> ملخص الميزانية الشهرية
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                            <span style="font-size: 12px; color: #10b981; font-weight: 600;">مباشر</span>
+                        </div>
+                    </div>
+                    <div id="live-budget-tracker">
+                        <!-- سيتم ملؤها بـ JavaScript -->
+                    </div>
+                </div>
+
+                <!-- إضافة فاتورة جديدة -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-plus-circle"></i> إضافة فاتورة جديدة
+                        </div>
+                        <div style="font-size: 12px; color: #718096; margin-top: 4px;">
+                            الفواتير الثابتة تُضاف للنظام وتظهر تلقائياً كل شهر، المتغيرة تُضاف للشهر المحدد فقط
+                        </div>
+                    </div>
+                    <form id="new-expense-form" onsubmit="handleExpenseFormSubmit(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">نوع الفاتورة</label>
+                                <select class="form-input" name="expense-type" id="expense-type" onchange="handleExpenseTypeChange()" required>
+                                    <option value="">-- اختر النوع --</option>
+                                    <option value="fixed">فاتورة ثابتة (تتكرر شهرياً)</option>
+                                    <option value="variable">فاتورة متغيرة (لهذا الشهر فقط)</option>
+                                </select>
+                                <div id="expense-type-help" style="font-size: 11px; color: #a0aec0; margin-top: 4px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">فئة المصروف</label>
+                                <select class="form-input" name="expense-category" id="expense-category" required>
+                                    <option value="">-- اختر الفئة --</option>
+                                    <option value="salaries">رواتب ومكافآت</option>
+                                    <option value="utilities">خدمات (كهرباء، مياه، إنترنت)</option>
+                                    <option value="rent">إيجارات</option>
+                                    <option value="maintenance">صيانة وإصلاحات</option>
+                                    <option value="supplies">مستلزمات وأدوات</option>
+                                    <option value="marketing">دعاية وتسويق</option>
+                                    <option value="transportation">مواصلات ونقل</option>
+                                    <option value="food">طعام ومشروبات</option>
+                                    <option value="equipment">معدات وأجهزة</option>
+                                    <option value="other">أخرى</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">اسم الفاتورة</label>
+                                <input type="text" class="form-input" name="expense-name" id="expense-name" 
+                                       placeholder="مثال: راتب مدرس أحمد، فاتورة الكهرباء" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المبلغ (جنيه)</label>
+                                <input type="number" class="form-input" name="expense-amount" id="expense-amount" 
+                                       step="0.01" min="0.01" placeholder="0.00" required>
+                            </div>
+                        </div>
+
+                        <!-- إعدادات الفاتورة الثابتة -->
+                        <div id="fixed-expense-settings" style="display: none;">
+                            <div style="background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                                <div style="display: flex; align-items: center; gap: 8px; color: #1890ff; font-weight: 600; margin-bottom: 12px;">
+                                    <i class="fas fa-repeat"></i>
+                                    <span>إعدادات الفاتورة الثابتة</span>
+                                </div>
+                                <div style="color: #595959; font-size: 12px; margin-bottom: 12px;">
+                                    ستُضاف هذه الفاتورة تلقائياً كل شهر في النظام الشهرية
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">تكرار الدفع</label>
+                                        <select class="form-input" name="expense-frequency" id="recurrence-frequency">
+                                            <option value="monthly">شهرياً</option>
+                                            <option value="quarterly">كل 3 أشهر</option>
+                                            <option value="yearly">سنوياً</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">تاريخ البدء</label>
+                                        <input type="date" class="form-input" name="start-date" id="start-date">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- إعدادات الفاتورة المتغيرة -->
+                        <div id="variable-expense-settings" style="display: none;">
+                            <div style="background: #fff7e6; border: 1px solid #ffd591; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                                <div style="display: flex; align-items: center; gap: 8px; color: #fa8c16; font-weight: 600; margin-bottom: 12px;">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <span>إعدادات الفاتورة المتغيرة</span>
+                                </div>
+                                <div style="color: #595959; font-size: 12px; margin-bottom: 12px;">
+                                    ستُضاف هذه الفاتورة للشهر المحدد فقط ولن تتكرر تلقائياً
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">الشهر المستهدف</label>
+                                    <input type="month" class="form-input" name="expense-month" id="expense-month">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">ملاحظات إضافية</label>
+                            <textarea class="form-input" name="expense-notes" id="expense-notes" rows="2" 
+                                      placeholder="أي تفاصيل إضافية عن الفاتورة..."></textarea>
+                        </div>
+
+                        <button type="submit" class="action-btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ الفاتورة
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- قوائم الفواتير -->
+            <div class="analytics-grid">
+                <!-- الفواتير الثابتة -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-calendar-check"></i> الفواتير الثابتة (الدورية)
+                        </div>
+                    </div>
+                    <div id="fixed-expenses-list">
+                        <!-- سيتم ملؤها بـ JavaScript -->
+                    </div>
+                </div>
+
+                <!-- نسخة مخصصة لعرض الفواتير المتغيرة (تعمل كنسخة منفصلة) -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-file-invoice"></i> فواتير الشهر الحالي (المتغيرة)
+                        </div>
+                    </div>
+                    <div id="fixed-expenses-list-2">
+                        <!-- سيتم ملؤها بـ JavaScript كعرض للفواتير المتغيرة -->
+                    </div>
+                </div>
+
+                <!-- removed: separate variable-expenses card (user requested deletion) -->
+            </div>
+
+            <!-- تقرير المصروفات الشهرية -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie"></i> تقرير المصروفات الشهرية
+                    </div>
+                    <button class="action-btn btn-primary" onclick="generateExpenseReport()">
+                        <i class="fas fa-file-export"></i> إنشاء التقرير
+                    </button>
+                </div>
+                <div id="expense-report-display">
+                    <!-- سيتم ملؤها بـ JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب اشتراكات المدرسين -->
+        <div id="transactions-tab" class="tab-content">
+            <!-- نظام تحديد الاشتراكات -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-users-cog"></i> نظام اشتراكات المدرسين
+                    </div>
+                    <button class="action-btn btn-primary" onclick="showTeacherSubscriptionModal()">
+                        <i class="fas fa-plus"></i> إضافة مدرس جديد
+                    </button>
+                </div>
+                
+                <!-- قائمة المدرسين ونظام النسب -->
+                <div id="teachers-subscriptions-list">
+                    <!-- سيتم ملؤها بـ JavaScript -->
+                </div>
+            </div>
+
+            <!-- ملخص الأرباح والتوزيع -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie"></i> ملخص توزيع الأرباح
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+                        <button class="action-btn btn-secondary" id="calculate-profit-btn" onclick="calculateAllTeachersRevenue()">
+                            <i class="fas fa-calculator"></i> حساب الأرباح
+                        </button>
+                        <button class="action-btn btn-secondary" id="create-invoice-btn" onclick="openCreateInvoiceForm()">
+                            <i class="fas fa-file-invoice"></i> إنشاء فاتورة
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="revenue-distribution-summary">
+                    <!-- سيتم ملؤها بـ JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- budget-plan modal removed as requested -->
+
+    <!-- Modal المعاملة المالية -->
+    <!-- Modal اشتراك المدرس -->
+    <div id="teacher-subscription-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-user-plus"></i> إعداد اشتراك مدرس جديد
+                </h3>
+                <button class="close-btn" onclick="closeTeacherSubscriptionModal()">&times;</button>
+            </div>
+            
+            <form id="teacher-subscription-form">
+                <!-- اختيار المدرس -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> اختيار المدرس
+                    </label>
+                    <select class="form-input" id="teacher-select" name="teacher" required>
+                        <option value="">-- اختر المدرس --</option>
+                        <!-- سيتم ملء المدرسين بـ JavaScript -->
+                    </select>
+                    <!-- hidden field to store the registered/business teacher id (e.g. tch001) -->
+                    <input type="hidden" id="teacher-registered-id" name="teacherRegisteredId" value="">
+                </div>
+                
+                <!-- نوع الاشتراك -->
+                <div class="subscription-type-section">
+                    <label class="form-label">
+                        <i class="fas fa-cogs"></i> نوع الاشتراك
+                    </label>
+                    <div class="subscription-types">
+                        <label class="radio-option">
+                            <input type="radio" name="subscriptionType" value="percentage" checked 
+                                   onchange="handleSubscriptionTypeChange()">
+                            <span class="radio-custom"></span>
+                            <span>
+                                <i class="fas fa-percentage"></i> نظام النسبة المئوية
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="subscriptionType" value="fixed" 
+                                   onchange="handleSubscriptionTypeChange()">
+                            <span class="radio-custom"></span>
+                            <span>
+                                <i class="fas fa-coins"></i> مرتب ثابت
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- إعدادات النسب المئوية -->
+                <div id="percentage-fields" class="percentage-section">
+                    <h4><i class="fas fa-chart-pie"></i> إعدادات النسب المئوية</h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">نسبة المدرس (%)</label>
+                            <input type="number" class="form-input" id="teacher-percentage" 
+                                   name="teacherPercentage" min="0" max="100" value="40" 
+                                   oninput="handlePercentageChange()" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">نسبة المركز (%)</label>
+                            <input type="number" class="form-input" id="center-percentage" 
+                                   name="centerPercentage" min="0" max="100" value="60" 
+                                   oninput="handleCenterPercentageChange()" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إعدادات المرتب الثابت -->
+                <div id="fixed-salary-field" class="form-group" style="display: none;">
+                    <label class="form-label">
+                        <i class="fas fa-money-bill-wave"></i> المرتب الشهري الثابت (جنيه)
+                    </label>
+                    <input type="number" class="form-input" id="fixed-salary" 
+                           name="fixedSalary" min="0" step="100" placeholder="أدخل المرتب الشهري...">
+                </div>
+
+                <!-- ملاحظات إضافية -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-sticky-note"></i> ملاحظات إضافية
+                    </label>
+                    <textarea class="form-input" id="subscription-notes" name="notes" rows="3" 
+                              placeholder="أي ملاحظات أو شروط خاصة بالاشتراك..."></textarea>
+                </div>
+
+                <!-- أزرار العمليات -->
+                <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end;">
+                    <button type="button" class="action-btn btn-secondary" onclick="closeTeacherSubscriptionModal()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button type="submit" class="action-btn btn-primary" onclick="saveTeacherSubscription()">
+                        <i class="fas fa-save"></i> حفظ الاشتراك
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal حساب أرباح المدرسين -->
+    <div id="revenue-calculation-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-file-invoice"></i> فواتير أرباح المدرسين
+                </h3>
+                <button class="close-btn" onclick="closeRevenueCalculationModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- اختيار المدرس -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user-tie"></i> اختر المدرس لحساب أرباحه
+                    </label>
+                    <select class="form-input" id="revenue-teacher-select" onchange="calculateTeacherRevenue()">
+                        <option value="">-- اختر المدرس --</option>
+                        <!-- سيتم ملؤها بـ JavaScript -->
+                    </select>
+                </div>
+
+                <!-- نتائج الحساب -->
+                <div id="revenue-calculation-results" style="display: none;">
+                    <!-- معلومات المدرس -->
+                    <div class="teacher-info-card">
+                        <div class="teacher-header">
+                            <div class="teacher-avatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="teacher-details">
+                                <h4 id="selected-teacher-name">اسم المدرس</h4>
+                                <p id="selected-teacher-groups">عدد المجموعات: 0</p>
+                            </div>
+                            <div class="subscription-badge">
+                                <span id="selected-teacher-type">نوع الاشتراك</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تفاصيل الحساب -->
+                    <div class="calculation-breakdown">
+                        <h5><i class="fas fa-chart-line"></i> تفاصيل الحساب</h5>
+                        
+                        <div class="calculation-grid">
+                            <div class="calc-item">
+                                <span class="calc-label">إجمالي الإيراد المتوقع</span>
+                                <span class="calc-value" id="total-expected-revenue">0 جنيه</span>
+                            </div>
+                            <div class="calc-item">
+                                <span class="calc-label">الإيراد المحصل فعلياً</span>
+                                <span class="calc-value" id="total-collected-revenue">0 جنيه</span>
+                            </div>
+                            <div class="calc-item">
+                                <span class="calc-label">نسبة التحصيل</span>
+                                <span class="calc-value" id="collection-percentage">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="revenue-distribution">
+                            <div class="distribution-item teacher">
+                                <div class="distribution-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="distribution-info">
+                                    <span class="distribution-label">نصيب المدرس</span>
+                                    <span class="distribution-percentage" id="teacher-percentage-display">0%</span>
+                                </div>
+                                <div class="distribution-amount" id="teacher-revenue-amount">0 جنيه</div>
+                            </div>
+                            
+                            <div class="distribution-item center">
+                                <div class="distribution-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="distribution-info">
+                                    <span class="distribution-label">نصيب المركز</span>
+                                    <span class="distribution-percentage" id="center-percentage-display">0%</span>
+                                </div>
+                                <div class="distribution-amount" id="center-revenue-amount">0 جنيه</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تفاصيل المجموعات -->
+                    <div class="groups-breakdown">
+                        <h5><i class="fas fa-users"></i> تفاصيل المجموعات</h5>
+                        <div id="teacher-groups-details">
+                            <!-- سيتم ملؤها بـ JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- أزرار العمليات -->
+                <div class="modal-actions" id="calculation-actions" style="display: none;">
+                    <button class="action-btn btn-primary" onclick="printInvoice()">
+                        <i class="fas fa-print"></i> طباعة الفاتورة
+                    </button>
+                    <button class="action-btn btn-secondary" onclick="downloadPDF()">
+                        <i class="fas fa-file-pdf"></i> تصدير PDF
+                    </button>
+                    <button class="action-btn btn-success" onclick="markAsPaid()">
+                        <i class="fas fa-check"></i> تسجيل كمدفوع
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔗 ملف الربط مع الباك إند -->
+    <script src="reports-system.js"></script>
+    <script src="financial-analytics.js"></script>
+</body>
+</html>
