@@ -1,4 +1,4 @@
-# Educational Management System - Complete Integrated Educational Management System
+# Complete Integrated Educational Management System
 
 **Name of the project:** Educational Management System
 
